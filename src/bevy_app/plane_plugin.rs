@@ -12,9 +12,12 @@ fn setup_plane(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
+    let color_vec4 = Vec4::new(0.3, 0.7, 0.5, 1.0);
+    let color_from_vec4 = Color::rgba_from_array(color_vec4);
+
     commands.spawn(PbrBundle {
-        mesh: meshes.add(shape::Plane::from_size(50.0).into()),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+        mesh: meshes.add(Plane3d::default().mesh().size(50.0, 50.0)),
+        material: materials.add(color_from_vec4),
         ..Default::default()
     });
 }

@@ -15,6 +15,9 @@ fn spawn_camera(mut commands: Commands) {
             ..Default::default()
         },
         PanOrbitCamera {
+            radius: Some(45.0),
+            focus: Vec3::new(0.0, 2.0, 0.0),
+            alpha: Some(0.5),
             ..Default::default()
         },
     ));

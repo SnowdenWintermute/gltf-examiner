@@ -15,7 +15,7 @@ pub struct CounterEvent {
 // BEVY MESSAGES
 #[derive(Debug)]
 pub enum MessageFromBevy {
-    Click,
+    Text(String),
 }
 // CHANNELS
 #[derive(Clone, Resource, Deref)]
