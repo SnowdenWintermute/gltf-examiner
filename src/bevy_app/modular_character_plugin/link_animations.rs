@@ -1,3 +1,4 @@
+use super::spawn_scenes::SpawnScenesState;
 use bevy::prelude::*;
 
 #[derive(Component, Debug)]
@@ -23,6 +24,7 @@ pub fn link_animations(
     all_entities_with_parents_query: Query<&Parent>,
     animations_entity_link_query: Query<&AnimationEntityLink>,
     mut commands: Commands,
+    mut next_state: ResMut<NextState<SpawnScenesState>>,
 ) {
     // Get all the Animation players which can be deep and hidden in the heirachy
     for entity_with_animation_player in animation_players_query.iter() {
@@ -35,14 +37,16 @@ pub fn link_animations(
         if animations_entity_link_query.get(top_entity).is_ok() {
             warn!("Problem with multiple animation players for the same top parent");
         } else {
-            println!(
-                "linking entity {:#?} to animation_player entity {:#?}",
-                top_entity, entity_with_animation_player
-            );
+            // println!(
+            //     "linking entity {:#?} to animation_player entity {:#?}",
+            //     top_entity, entity_with_animation_player
+            // );
             commands
                 .entity(top_entity)
                 .insert(AnimationEntityLink(entity_with_animation_player.clone()));
         }
     }
+
+    next_state.set(SpawnScenesState::Done)
 }
 

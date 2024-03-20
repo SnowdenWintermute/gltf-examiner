@@ -4,42 +4,47 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bevy = "0.13.0"
+# shared
+crossbeam-channel = "0.5.8"
+
+# yew
 gloo = "0.10.0"
 js-sys = "0.3.64"
 yew = { version = "0.21.0", features = ["csr"] }
 wasm-bindgen = "0.2.88"
-crossbeam-channel = "0.5.8"
-bevy_panorbit_camera = "0.16.0"
 
-# [dependencies.bevy]
-# version = "0.13.0"
+# bevy
+bevy_panorbit_camera = "0.16.0"
+bevy_mod_billboard = { git = "https://github.com/kulkalkul/bevy_mod_billboard" }
+bevy_asset_loader ="0.20"
+[dependencies.bevy]
+version = "0.13.0"
 # Disable the default features if there are any that you do not want
-# default-features = false
-# features = [
-#     "animation",
-#     "bevy_asset",
-#     "bevy_audio",
-#     "bevy_gilrs",
-#     "bevy_scene",
-#     "bevy_winit",
-#     "bevy_core_pipeline",
-#     "bevy_pbr",
-#     "bevy_gltf",
-#     "bevy_render",
-#     "bevy_sprite",
-#     "bevy_text",
-#     "bevy_ui",
-#     # "multi-threaded",
-#     "png",
-#     "hdr",
-#     "vorbis",
-#     "x11",
-#     "bevy_gizmos",
-#     "android_shared_stdcxx",
-#     "tonemapping_luts",
-#     "default_font",
-#     "webgl2",
-#     "bevy_debug_stepping" ,
-#     ]
+default-features = false
+features = [
+    "animation",
+    "bevy_asset",
+    "bevy_audio",
+    # "bevy_gilrs",
+    "bevy_scene",
+    "bevy_winit",
+    "bevy_core_pipeline",
+    "bevy_pbr",
+    "bevy_gltf",
+    "bevy_render",
+    # "bevy_sprite",
+    "bevy_text",
+    # "bevy_ui",
+    # "multi-threaded",
+    "png",
+    "hdr",
+    "vorbis",
+    # "x11",
+    "bevy_gizmos",
+    # "android_shared_stdcxx",
+    "tonemapping_luts",
+    "default_font",
+    "webgl2",
+    # "bevy_debug_stepping" ,
+    ]
 

@@ -11,7 +11,7 @@ pub fn check_for_messages(
 ) {
     for message_from_bevy in receiver.try_iter() {
         match message_from_bevy {
-            MessageFromBevy::Text(text) => log!(format!("got message from bevy: {text}")),
+            MessageFromBevy::Text(text) => log!(format!("got messagee from bevy: {text}")),
         };
         num_messages_state.set(*num_messages_state + 1);
     }

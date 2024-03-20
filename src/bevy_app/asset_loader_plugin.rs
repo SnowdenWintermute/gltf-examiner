@@ -1,11 +1,8 @@
 use bevy::gltf::Gltf;
-use bevy::prelude::*;
-use gloo::console::log;
+use bevy::{prelude::*, utils::HashMap};
+use bevy_asset_loader::prelude::*;
 
-use crate::comm_channels::BevyTransmitter;
-use crate::comm_channels::MessageFromBevy;
-
-#[derive(Debug, Default, Hash, PartialEq, Eq, Clone, States)]
+#[derive(States, Clone, Eq, PartialEq, Default, Hash, Debug)]
 pub enum AssetLoaderState {
     #[default]
     Loading,
@@ -15,40 +12,22 @@ pub enum AssetLoaderState {
 pub struct AssetLoaderPlugin;
 impl Plugin for AssetLoaderPlugin {
     fn build(&self, app: &mut App) {
-        app.init_state::<AssetLoaderState>()
-            .add_systems(OnEnter(AssetLoaderState::Loading), load_assets)
-            .add_systems(
-                Update,
-                check_for_load_complete.run_if(in_state(AssetLoaderState::Loading)),
-            );
+        app.init_state::<AssetLoaderState>().add_loading_state(
+            LoadingState::new(AssetLoaderState::Loading)
+                .continue_to_state(AssetLoaderState::Done)
+                .load_collection::<MyAssets>(),
+        );
     }
 }
 
-#[derive(Resource, Debug)]
-pub struct AssetPack(pub Handle<Gltf>);
-
-fn load_assets(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let handle = asset_server.load("Cleric.gltf");
-    commands.insert_resource(AssetPack(handle));
+#[derive(AssetCollection, Resource)]
+pub struct MyAssets {
+    #[asset(
+        paths("main_skeleton.glb", "scifi_torso.glb", "witch_legs.glb", "sword.glb"),
+        collection(typed, mapped)
+    )]
+    pub gltf_files: HashMap<String, Handle<Gltf>>,
+    #[asset(paths("FiraSans-Regular.ttf"), collection(typed, mapped))]
+    pub font_files: HashMap<String, Handle<Font>>,
 }
 
-fn check_for_load_complete(
-    asset_pack: Res<AssetPack>,
-    bevy_transmitter: Res<BevyTransmitter>,
-    mut next_state: ResMut<NextState<AssetLoaderState>>,
-    mut asset_events: EventReader<AssetEvent<Gltf>>,
-) {
-    for event in asset_events.read() {
-        if event.is_loaded_with_dependencies(asset_pack.0.clone()) {
-            log!("asset loaded (bevy log)");
-            let send_message_result =
-                bevy_transmitter.send(MessageFromBevy::Text(String::from("asset loaded")));
-            match send_message_result {
-                Ok(_) => log!("sent message to yew"),
-                Err(error) => log!(format!("send message error: {:#?}", error)),
-            };
-
-            next_state.set(AssetLoaderState::Done)
-        }
-    }
-}
