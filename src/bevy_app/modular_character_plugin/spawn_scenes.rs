@@ -27,42 +27,50 @@ pub fn spawn_scenes(
     let mut animations = HashMap::new();
     let mut scene_entities_by_name = HashMap::new();
 
-    // let mut x = 0.0;
     // SPAWN SCENES
-    for (name, gltf_handle) in &asset_pack.gltf_files {
-        if let Some(gltf) = assets_gltf.get(gltf_handle) {
-            info!("SPAWING: {}", name);
-            let mut transform = Transform::from_xyz(0.0, 0.0, 0.0);
-
-            if name == "sword.glb" {
-                transform.scale = Vec3::splat(0.1)
-            }
-
-            let entity_commands = commands.spawn((
-                SceneBundle {
-                    scene: gltf.named_scenes["Scene"].clone(),
-                    transform,
-                    ..Default::default()
-                },
-                SceneName(name.clone()),
-            ));
-
-            let entity = entity_commands.id();
-            scene_entities_by_name.insert(name.clone(), entity);
-
-            for named_animation in gltf.named_animations.iter() {
-                info!("inserting animation: {}", named_animation.0);
-                animations.insert(
-                    named_animation.0.clone(),
-                    gltf.named_animations[named_animation.0].clone(),
-                );
-            }
-        }
-        // x += 2.0;
+    for (name, gltf_handle) in &asset_pack.main_skeletons_with_animations {
+        spawn_scene(
+            &mut commands,
+            &assets_gltf,
+            gltf_handle.clone(),
+            name.clone(),
+            &mut animations,
+            &mut scene_entities_by_name,
+        );
     }
 
     commands.insert_resource(Animations(animations));
     commands.insert_resource(SceneEntitiesByName(scene_entities_by_name));
 
     next_state.set(SpawnScenesState::Spawned)
+}
+
+pub fn spawn_scene(
+    commands: &mut Commands,
+    assets_gltf: &Res<Assets<Gltf>>,
+    gltf_handle: Handle<Gltf>,
+    name: String,
+    animations: &mut HashMap<String, Handle<AnimationClip>>,
+    scene_entities_by_name: &mut HashMap<String, Entity>,
+) {
+    if let Some(gltf) = assets_gltf.get(gltf_handle) {
+        let entity_commands = commands.spawn((
+            SceneBundle {
+                scene: gltf.named_scenes["Scene"].clone(),
+                ..Default::default()
+            },
+            SceneName(name.clone()),
+        ));
+
+        let entity = entity_commands.id();
+        scene_entities_by_name.insert(name.clone(), entity);
+
+        for named_animation in gltf.named_animations.iter() {
+            info!("inserting animation: {}", named_animation.0);
+            animations.insert(
+                named_animation.0.clone(),
+                gltf.named_animations[named_animation.0].clone(),
+            );
+        }
+    }
 }

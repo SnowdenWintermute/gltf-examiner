@@ -9,11 +9,11 @@ use broadcast::Sender;
 // YEW MESSAGES
 #[derive(Debug, Clone)]
 pub enum MessageFromYew {
-    Counter(CounterEvent),
+    Text(TextFromYewEvent),
 }
 #[derive(Clone, Debug, Event)]
-pub struct CounterEvent {
-    pub value: i32,
+pub struct TextFromYewEvent {
+    pub text: String,
 }
 // BEVY MESSAGES
 #[derive(Debug, Clone, PartialEq)]

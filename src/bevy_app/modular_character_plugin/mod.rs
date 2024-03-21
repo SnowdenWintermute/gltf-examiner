@@ -9,6 +9,7 @@ use self::{
 use crate::bevy_app::asset_loader_plugin::AssetLoaderState;
 use bevy::prelude::*;
 mod assemble_parts;
+mod collect_parts;
 mod link_animations;
 mod paint_cubes_on_joints;
 mod print_scene_tree;
@@ -34,4 +35,3 @@ impl Plugin for ModularCharacterPlugin {
             );
     }
 }
-

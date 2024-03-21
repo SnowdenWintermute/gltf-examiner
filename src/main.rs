@@ -17,18 +17,10 @@ fn main() {
         name: "This can be used for shared state".to_string(),
     }));
     let (yew_channel, bevy_channel) = create_comm_channels();
-    let comm_channel_bevy_plugin = CommChannelPlugin::new(
-        bevy_channel.0.clone(),
-        bevy_channel.1,
-        yew_channel.0.clone(),
-    );
+    let comm_channel_bevy_plugin =
+        CommChannelPlugin::new(bevy_channel.0.clone(), yew_channel.0.clone());
 
-    yew_main(
-        yew_channel.0,
-        yew_channel.1,
-        bevy_channel.0,
-        shared_state.clone(),
-    );
+    yew_main(yew_channel.0, bevy_channel.0, shared_state.clone());
     bevy_main(comm_channel_bevy_plugin, shared_state);
     //
 }
