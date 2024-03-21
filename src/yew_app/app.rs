@@ -2,7 +2,8 @@ use super::Props;
 use crate::comm_channels::{CounterEvent, MessageFromBevy, MessageFromYew};
 use crossbeam_channel::Receiver;
 use gloo::{console::log, timers::callback::Timeout};
-use yew::prelude::*;
+use rand::Rng;
+use yew::{platform::spawn_local, prelude::*};
 
 pub fn check_for_messages(
     receiver: Receiver<MessageFromBevy>,
@@ -32,8 +33,32 @@ pub fn app(props: &Props) -> Html {
     let counter_state = use_state(|| 0);
     let transmitter = props.transmitter.clone();
     let name = props.shared.lock().unwrap().name.clone();
-    let message_listener_timer_state = use_state(|| None);
     let num_messages_received_state = use_state(|| 0);
+
+    //let cloned_transmitter
+    //use_effect_with((), move |_| {
+    //    //
+    //});
+
+    let state = use_state(|| String::new());
+    let mut receiver = props.bevy_transmitter.subscribe();
+    use_effect_with((), {
+        let state = state.clone();
+        let num_messages_received_state = num_messages_received_state.clone();
+        move |()| {
+            let num_messages_received_state = num_messages_received_state.clone();
+            let state = state.clone();
+            spawn_local(async move {
+                while let Ok(message) = receiver.recv().await {
+                    log!("new message from bevy");
+                    state.set("new_message".to_string());
+                    let mut rng = rand::thread_rng();
+                    let random_num = rng.gen_range(0..100);
+                    num_messages_received_state.set(random_num);
+                }
+            });
+        }
+    });
 
     let cloned_message_listener_timer_state = message_listener_timer_state.clone();
     let cloned_num_messages_received_state = num_messages_received_state.clone();
@@ -50,6 +75,8 @@ pub fn app(props: &Props) -> Html {
         })));
     });
 
+    // // use_effect_with((), f)
+
     let cloned_counter_state = counter_state.clone();
     let handle_click = Callback::from(move |_| {
         let value = *cloned_counter_state + 1;
@@ -65,6 +92,7 @@ pub fn app(props: &Props) -> Html {
                 <button onclick={handle_click} >{ "+1" }</button>
                 <p>{ *counter_state }</p>
                 {"ay"}
+        {format!("{:?}",*num_messages_received_state)}
             </div>
         </main>
     }

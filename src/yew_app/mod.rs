@@ -1,5 +1,6 @@
 mod app;
 use self::app::App;
+use crate::comm_channels::BevyTransmitter;
 use crate::comm_channels::YewReceiver;
 use crate::comm_channels::YewTransmitter;
 use crate::SharedState;
@@ -12,6 +13,7 @@ pub struct Props {
     pub shared: Arc<Mutex<SharedState>>,
     pub transmitter: YewTransmitter,
     pub receiver: YewReceiver,
+    pub bevy_transmitter: BevyTransmitter,
 }
 
 impl PartialEq for Props {
@@ -23,6 +25,7 @@ impl PartialEq for Props {
 pub fn yew_main(
     yew_transmitter: YewTransmitter,
     yew_receiver: YewReceiver,
+    bevy_transmitter: BevyTransmitter,
     shared: Arc<Mutex<SharedState>>,
 ) {
     let document = gloo::utils::document();
@@ -30,6 +33,7 @@ pub fn yew_main(
     let props = Props {
         transmitter: yew_transmitter,
         receiver: yew_receiver,
+        bevy_transmitter,
         shared,
     };
     yew::Renderer::<App>::with_root_and_props(root, props).render();
