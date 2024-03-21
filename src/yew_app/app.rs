@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use super::Props;
 use crate::comm_channels::{CounterEvent, MessageFromBevy, MessageFromYew};
 use crossbeam_channel::Receiver;
@@ -34,51 +36,48 @@ pub fn app(props: &Props) -> Html {
     let transmitter = props.transmitter.clone();
     let name = props.shared.lock().unwrap().name.clone();
     let num_messages_received_state = use_state(|| 0);
+    let new_bevy_messages_state = use_state(|| Vec::new());
+    let queued_bevy_messages_state: UseStateHandle<Vec<MessageFromBevy>> = use_state(|| Vec::new());
 
-    //let cloned_transmitter
-    //use_effect_with((), move |_| {
-    //    //
-    //});
-
-    let state = use_state(|| String::new());
     let mut receiver = props.bevy_transmitter.subscribe();
     use_effect_with((), {
-        let state = state.clone();
         let num_messages_received_state = num_messages_received_state.clone();
+        let new_bevy_messages_state = new_bevy_messages_state.clone();
         move |()| {
             let num_messages_received_state = num_messages_received_state.clone();
-            let state = state.clone();
+            let new_bevy_messages_state = new_bevy_messages_state.clone();
             spawn_local(async move {
                 while let Ok(message) = receiver.recv().await {
-                    log!("new message from bevy");
-                    state.set("new_message".to_string());
-                    let mut rng = rand::thread_rng();
-                    let random_num = rng.gen_range(0..100);
-                    num_messages_received_state.set(random_num);
+                    // log!("new message from bevy");
+                    // let mut rng = rand::thread_rng();
+                    // let random_num = rng.gen_range(0..100);
+                    //
+                    new_bevy_messages_state.set(Vec::from([message]));
+                    let old_state = *num_messages_received_state;
+                    num_messages_received_state.set(old_state + 1);
                 }
             });
         }
     });
 
-    let cloned_message_listener_timer_state = message_listener_timer_state.clone();
-    let cloned_num_messages_received_state = num_messages_received_state.clone();
-    let cloned_receiver = props.receiver.clone();
-    use_effect_with((), move |_| {
-        let cloned_cloned_message_listener_timer_state =
-            cloned_message_listener_timer_state.clone();
-        cloned_message_listener_timer_state.set(Some(Timeout::new(1, move || {
-            check_for_messages(
-                cloned_receiver,
-                cloned_num_messages_received_state,
-                cloned_cloned_message_listener_timer_state,
-            )
-        })));
+    let cloned_queued_bevy_messages_state = queued_bevy_messages_state.clone();
+    let cloned_new_bevy_messages_state = new_bevy_messages_state.clone();
+    use_effect_with(new_bevy_messages_state, move |_| {
+        let mut messages_to_enqueue = cloned_new_bevy_messages_state.deref().clone();
+        let mut current_messages = cloned_queued_bevy_messages_state.deref().clone();
+        current_messages.append(&mut messages_to_enqueue);
+        if current_messages.len() > 10 {
+            let (removed, current_messages) = current_messages.split_at(10);
+            cloned_queued_bevy_messages_state.set(current_messages.to_vec());
+        } else {
+            cloned_queued_bevy_messages_state.set(current_messages);
+        }
+        cloned_new_bevy_messages_state.set(Vec::new());
     });
-
-    // // use_effect_with((), f)
 
     let cloned_counter_state = counter_state.clone();
     let handle_click = Callback::from(move |_| {
+        log!("clicked");
         let value = *cloned_counter_state + 1;
         cloned_counter_state.set(value);
         transmitter
@@ -86,13 +85,24 @@ pub fn app(props: &Props) -> Html {
             .expect("could not send event");
     });
 
+    let mut messages_to_display = Vec::new();
+
+    for message in queued_bevy_messages_state.deref() {
+        match message {
+            MessageFromBevy::Text(text) => {
+                messages_to_display.push(html!(<span>{format!("{text}, ")}</span>))
+            }
+        };
+    }
+
     html! {
         <main>
             <div class="text-white">
-                <button onclick={handle_click} >{ "+1" }</button>
+                <button onclick={handle_click} class="h-10 w-60 border border-white " >{ "+1" }</button>
                 <p>{ *counter_state }</p>
-                {"ay"}
-        {format!("{:?}",*num_messages_received_state)}
+                // {
+                    // messages_to_display
+                // }
             </div>
         </main>
     }

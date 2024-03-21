@@ -16,7 +16,7 @@ pub struct CounterEvent {
     pub value: i32,
 }
 // BEVY MESSAGES
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum MessageFromBevy {
     Text(String),
 }
