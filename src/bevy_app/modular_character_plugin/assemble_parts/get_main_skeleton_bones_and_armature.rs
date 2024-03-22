@@ -5,7 +5,7 @@ use bevy::prelude::*;
 use bevy::utils::HashMap;
 
 pub fn get_main_skeleton_bones_and_armature(
-    scene_entities_by_name: Res<SceneEntitiesByName>,
+    scene_entities_by_name: &ResMut<SceneEntitiesByName>,
     all_entities_with_children: &Query<&Children>,
     names: &Query<&Name>,
 ) -> (HashMap<String, Entity>, Entity) {

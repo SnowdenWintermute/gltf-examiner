@@ -1,21 +1,23 @@
 pub mod comm_channel_bevy_plugin;
-use bevy::prelude::*;
-use tokio::sync::broadcast;
-// use crossbeam_channel::Receiver;
-// use crossbeam_channel::Sender;
+use crate::frontend_common::CharacterPartSelection;
 use crate::frontend_common::PartsByName;
+use bevy::prelude::*;
 use broadcast::Receiver;
 use broadcast::Sender;
+use tokio::sync::broadcast;
 
 // YEW MESSAGES
 #[derive(Debug, Clone)]
 pub enum MessageFromYew {
     Text(TextFromYewEvent),
+    SelectCharacterPart(CharacterPartSelection),
 }
 #[derive(Clone, Debug, Event)]
 pub struct TextFromYewEvent {
     pub text: String,
 }
+#[derive(Clone, Debug, Event)]
+pub struct CharacterPartSelectionEvent(pub CharacterPartSelection);
 // BEVY MESSAGES
 #[derive(Debug, Clone, PartialEq)]
 pub enum MessageFromBevy {
@@ -27,6 +29,12 @@ pub enum MessageFromBevy {
 pub struct YewTransmitter(pub Sender<MessageFromYew>);
 #[derive(Resource, Deref, DerefMut)]
 pub struct YewReceiver(pub Receiver<MessageFromBevy>);
+
+impl PartialEq for YewTransmitter {
+    fn eq(&self, other: &Self) -> bool {
+        true
+    }
+}
 
 #[derive(Resource, Deref, DerefMut, Clone)]
 pub struct BevyTransmitter(pub Sender<MessageFromBevy>);

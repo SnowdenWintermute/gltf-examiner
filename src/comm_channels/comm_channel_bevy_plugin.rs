@@ -1,5 +1,6 @@
 use super::BevyReceiver;
 use super::BevyTransmitter;
+use super::CharacterPartSelectionEvent;
 use super::MessageFromBevy;
 use super::MessageFromYew;
 use super::TextFromYewEvent;
@@ -30,6 +31,7 @@ impl Plugin for CommChannelPlugin {
         app.insert_resource(BevyReceiver(self.yew_transmitter.subscribe()))
             .insert_resource(self.bevy_transmitter.clone())
             .init_resource::<Events<TextFromYewEvent>>()
+            .init_resource::<Events<CharacterPartSelectionEvent>>()
             .add_systems(PreUpdate, handle_yew_messages);
     }
 }
@@ -37,11 +39,15 @@ impl Plugin for CommChannelPlugin {
 fn handle_yew_messages(
     mut bevy_receiver: ResMut<BevyReceiver>,
     mut counter_event_writer: EventWriter<TextFromYewEvent>,
+    mut part_selection_event_writer: EventWriter<CharacterPartSelectionEvent>,
 ) {
     if let Ok(message_from_yew) = bevy_receiver.try_recv() {
         match message_from_yew {
             MessageFromYew::Text(event) => {
                 counter_event_writer.send(event);
+            }
+            MessageFromYew::SelectCharacterPart(part_selection) => {
+                part_selection_event_writer.send(CharacterPartSelectionEvent(part_selection));
             }
         }
     }

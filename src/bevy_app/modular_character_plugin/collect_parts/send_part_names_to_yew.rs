@@ -9,6 +9,7 @@ pub fn send_part_names_to_yew(asset_pack: Res<MyAssets>, transmitter: ResMut<Bev
     let mut part_names = PartsByName::default();
 
     for (name, _) in &asset_pack.heads {
+        info!("sending head name: {name}");
         part_names.heads.insert(name.clone());
     }
     for (name, _) in &asset_pack.torsos {

@@ -1,5 +1,8 @@
 use super::{store::AppStore, Props};
-use crate::comm_channels::{MessageFromBevy, MessageFromYew, TextFromYewEvent};
+use crate::{
+    comm_channels::{MessageFromBevy, MessageFromYew, TextFromYewEvent},
+    yew_app::character_part_selection_menu::CharacterPartSelectionMenu,
+};
 use gloo::console::log;
 use std::ops::Deref;
 use yew::{platform::spawn_local, prelude::*};
@@ -13,6 +16,12 @@ pub fn app(props: &Props) -> Html {
         bevy_transmitter,
         shared,
     } = props;
+
+    let cloned_transmitter = props.transmitter.clone();
+    let cloned_dispatch = dispatch.clone();
+    use_effect_with((), move |_| {
+        cloned_dispatch.reduce_mut(|store| store.transmitter_option = Some(cloned_transmitter))
+    });
 
     let counter_state = use_state(|| 0);
     let transmitter = yew_transmitter.clone();
@@ -54,26 +63,10 @@ pub fn app(props: &Props) -> Html {
         cloned_most_recent_message_from_bevy_state.set(Vec::new());
     });
 
-    // HOW TO USE TRANSMITER
-    let cloned_counter_state = counter_state.clone();
-    let handle_click = Callback::from(move |_| {
-        log!("clicked");
-        let value = *cloned_counter_state + 1;
-        cloned_counter_state.set(value);
-        transmitter
-            .send(MessageFromYew::Text(TextFromYewEvent {
-                text: format!("{}", value),
-            }))
-            .expect("could not send event");
-    });
-
     html! {
-        <main>
-            <div class="text-white">
-                <button onclick={handle_click} class="h-10 w-60 border border-white " >{ "+1" }</button>
-            </div>
+        <main class="text-zinc-300" >
             {queued_bevy_messages_state.deref().iter().map(|item| html!(<div>{format!("{:#?}", item)}</div>)).collect::<Html>()}
-        {app_state.parts_available.heads.iter().map(|item| html!(<div>{format!("{:#?}", item)}</div>)).collect::<Html>()}
+            <CharacterPartSelectionMenu />
         </main>
     }
 }
