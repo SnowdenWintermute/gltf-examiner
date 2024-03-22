@@ -29,7 +29,7 @@ pub fn spawn_scenes(
 
     // SPAWN SCENES
     for (name, gltf_handle) in &asset_pack.main_skeletons_with_animations {
-        spawn_scene(
+        spawn_and_register_scene(
             &mut commands,
             &assets_gltf,
             gltf_handle.clone(),
@@ -45,7 +45,7 @@ pub fn spawn_scenes(
     next_state.set(SpawnScenesState::Spawned)
 }
 
-pub fn spawn_scene(
+pub fn spawn_and_register_scene(
     commands: &mut Commands,
     assets_gltf: &Res<Assets<Gltf>>,
     gltf_handle: Handle<Gltf>,

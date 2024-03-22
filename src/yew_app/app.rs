@@ -1,11 +1,13 @@
-use super::Props;
+use super::{store::AppStore, Props};
 use crate::comm_channels::{MessageFromBevy, MessageFromYew, TextFromYewEvent};
 use gloo::console::log;
 use std::ops::Deref;
 use yew::{platform::spawn_local, prelude::*};
+use yewdux::use_store;
 
 #[function_component(App)]
 pub fn app(props: &Props) -> Html {
+    let (app_state, dispatch) = use_store::<AppStore>();
     let Props {
         transmitter: yew_transmitter,
         bevy_transmitter,
@@ -22,11 +24,20 @@ pub fn app(props: &Props) -> Html {
     let mut receiver = bevy_transmitter.subscribe();
     use_effect_with((), {
         let most_recent_message_from_bevy_state = most_recent_message_from_bevy_state.clone();
+        let dispatch = dispatch.clone();
         move |()| {
             let most_recent_message_from_bevy_state = most_recent_message_from_bevy_state.clone();
+            let dispatch = dispatch.clone();
             spawn_local(async move {
                 while let Ok(message) = receiver.recv().await {
-                    most_recent_message_from_bevy_state.set(Vec::from([message]));
+                    log!(format!("got message from bevy: {:#?}", message));
+                    most_recent_message_from_bevy_state.set(Vec::from([message.clone()]));
+                    match message {
+                        MessageFromBevy::Text(_) => todo!(),
+                        MessageFromBevy::PartNames(part_names) => {
+                            dispatch.reduce_mut(|store| store.parts_available = part_names)
+                        }
+                    }
                 }
             });
         }
@@ -61,6 +72,8 @@ pub fn app(props: &Props) -> Html {
             <div class="text-white">
                 <button onclick={handle_click} class="h-10 w-60 border border-white " >{ "+1" }</button>
             </div>
+            {queued_bevy_messages_state.deref().iter().map(|item| html!(<div>{format!("{:#?}", item)}</div>)).collect::<Html>()}
+        {app_state.parts_available.heads.iter().map(|item| html!(<div>{format!("{:#?}", item)}</div>)).collect::<Html>()}
         </main>
     }
 }

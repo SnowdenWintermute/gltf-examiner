@@ -6,6 +6,7 @@ use std::sync::Mutex;
 use yew_app::yew_main;
 mod bevy_app;
 mod comm_channels;
+mod frontend_common;
 mod yew_app;
 
 pub struct SharedState {

@@ -11,13 +11,14 @@ impl Plugin for CameraPlugin {
 fn spawn_camera(mut commands: Commands) {
     commands.spawn((
         Camera3dBundle {
-            transform: Transform::from_xyz(3.0, 3.0, 3.0),
+            transform: Transform::from_xyz(0.0, 0.0, 3.0),
             ..Default::default()
         },
         PanOrbitCamera {
-            radius: Some(45.0),
-            focus: Vec3::new(0.0, 2.0, 0.0),
-            alpha: Some(0.5),
+            focus: Vec3::new(0.0, 1.0, 0.0),
+            radius: Some(6.0),
+            alpha: Some(1.0),
+            beta: Some(0.5),
             ..Default::default()
         },
     ));

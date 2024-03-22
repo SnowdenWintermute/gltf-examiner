@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use tokio::sync::broadcast;
 // use crossbeam_channel::Receiver;
 // use crossbeam_channel::Sender;
+use crate::frontend_common::PartsByName;
 use broadcast::Receiver;
 use broadcast::Sender;
 
@@ -19,6 +20,7 @@ pub struct TextFromYewEvent {
 #[derive(Debug, Clone, PartialEq)]
 pub enum MessageFromBevy {
     Text(String),
+    PartNames(PartsByName),
 }
 // CHANNELS
 #[derive(Clone, Resource, Deref)]

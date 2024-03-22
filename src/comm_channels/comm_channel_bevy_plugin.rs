@@ -36,15 +36,8 @@ impl Plugin for CommChannelPlugin {
 
 fn handle_yew_messages(
     mut bevy_receiver: ResMut<BevyReceiver>,
-    transmitter: ResMut<BevyTransmitter>,
     mut counter_event_writer: EventWriter<TextFromYewEvent>,
-    mut sent_message_count: ResMut<SentMessageCounterResource>,
 ) {
-    let result = transmitter.send(MessageFromBevy::Text(format!(
-        "{}",
-        sent_message_count.value
-    )));
-
     if let Ok(message_from_yew) = bevy_receiver.try_recv() {
         match message_from_yew {
             MessageFromYew::Text(event) => {

@@ -1,4 +1,5 @@
 mod app;
+mod store;
 use self::app::App;
 use crate::comm_channels::BevyTransmitter;
 use crate::comm_channels::YewTransmitter;
