@@ -21,9 +21,9 @@ impl Plugin for PartChangePlugin {
                 Update,
                 (
                     ((
+                        mark_scenes_as_loaded,
                         despawn_old_parts,
                         spawn_new_parts,
-                        mark_scenes_as_loaded,
                         attach_newly_spawned_parts,
                     )
                         .chain())

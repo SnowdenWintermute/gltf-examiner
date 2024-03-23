@@ -1,20 +1,15 @@
-use crate::{
-    bevy_app::modular_character_plugin::{
-        assemble_parts::{
-            attach_part_to_main_skeleton::attach_part_to_main_skeleton,
-            get_main_skeleton_bones_and_armature::get_main_skeleton_bones_and_armature,
-        },
-        spawn_scenes::{SceneEntitiesByName, SceneLoaded, SceneName},
-        AttachedPartsReparentedEntities, SpawnedPartEvent,
+use crate::bevy_app::modular_character_plugin::{
+    assemble_parts::{
+        attach_part_to_main_skeleton::attach_part_to_main_skeleton,
+        get_main_skeleton_bones_and_armature::get_main_skeleton_bones_and_armature,
     },
-    comm_channels::CharacterPartSelectionEvent,
+    spawn_scenes::{SceneEntitiesByName, SceneLoaded, SceneName},
+    AttachedPartsReparentedEntities,
 };
 use bevy::prelude::*;
 
 pub fn attach_newly_spawned_parts(
     mut commands: Commands,
-    // mut attach_newly_spawned_parts_event_reader: EventReader<SpawnedPartEvent>,
-    mut part_selection_event_reader: EventReader<CharacterPartSelectionEvent>,
     mut attached_parts_reparented_entities: ResMut<AttachedPartsReparentedEntities>,
     scene_entities_by_name: ResMut<SceneEntitiesByName>,
     recently_loaded_scenes_query: Query<

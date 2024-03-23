@@ -2,6 +2,7 @@ mod asset_loader_plugin;
 mod camera_plugin;
 pub mod modular_character_plugin;
 mod plane_plugin;
+mod utils;
 use self::asset_loader_plugin::AssetLoaderPlugin;
 use self::camera_plugin::CameraPlugin;
 use self::modular_character_plugin::ModularCharacterPlugin;

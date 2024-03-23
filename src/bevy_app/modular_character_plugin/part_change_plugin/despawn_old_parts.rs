@@ -16,23 +16,26 @@ pub fn despawn_old_parts(
         CharacterSpawnedPartSceneNamesByCategory,
     >,
     mut scene_entities_by_name: ResMut<SceneEntitiesByName>,
+    all_entities_with_children: Query<&Children>,
+    names: Query<&Name>,
 ) {
     for event in part_selection_event_reader.read() {
         info!("despawner read part selection event: {:#?}", event);
-        let file_name = &event.0.name;
+        // let file_name = &event.0.name;
         let category = &event.0.category;
 
         // DESPAWN ANY CURRENT PARTS OF REQUESTED CATEGORY
-        let current_part_in_category_option = character_spawned_part_scene_names_by_category
+        if let Some(scene_name) = character_spawned_part_scene_names_by_category
             .0
-            .get(category);
-
-        if let Some(scene_name) = current_part_in_category_option {
+            .remove(category)
+        {
             despawn_attached_part(
                 &mut commands,
                 &scene_name,
                 &mut attached_parts_reparented_entities,
                 &mut scene_entities_by_name,
+                &all_entities_with_children,
+                &names,
             );
         }
     }

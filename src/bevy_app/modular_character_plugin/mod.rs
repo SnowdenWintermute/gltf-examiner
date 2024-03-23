@@ -21,7 +21,7 @@ mod spawn_scenes;
 
 #[derive(Resource, Default)]
 pub struct AttachedPartsReparentedEntities {
-    parts_and_entities: HashMap<String, Vec<Entity>>,
+    parts_and_entities: HashMap<Entity, Vec<Entity>>,
 }
 
 #[derive(Resource, Default)]
