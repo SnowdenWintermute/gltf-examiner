@@ -4,10 +4,11 @@ use self::{
     collect_parts::CollectPartsPlugin,
     handle_part_change_request::handle_part_change_request,
     link_animations::link_animations,
+    mark_scenes_as_loaded::mark_scenes_as_loaded,
     paint_cubes_on_joints::paint_cubes_on_joints,
     print_scene_tree::print_scene_tree,
     run_animations::run_animations,
-    spawn_scenes::{spawn_scenes, SceneEntitiesByName, SpawnScenesState},
+    spawn_scenes::{spawn_skeleton, SceneEntitiesByName, SpawnScenesState},
 };
 use crate::{
     bevy_app::asset_loader_plugin::AssetLoaderState,
@@ -20,6 +21,7 @@ pub mod collect_parts;
 mod despawn_attached_part;
 mod handle_part_change_request;
 mod link_animations;
+mod mark_scenes_as_loaded;
 mod paint_cubes_on_joints;
 mod print_scene_tree;
 mod run_animations;
@@ -34,7 +36,7 @@ pub struct AttachedPartsReparentedEntities {
 pub struct CharacterSpawnedPartSceneNamesByCategory(pub HashMap<CharacterPartCategories, String>);
 
 #[derive(Event)]
-pub struct SpawnedPartEvent(pub CharacterPartSelection);
+pub struct SpawnedPartEvent(pub String);
 
 pub struct ModularCharacterPlugin;
 impl Plugin for ModularCharacterPlugin {
@@ -45,7 +47,7 @@ impl Plugin for ModularCharacterPlugin {
             .init_resource::<SceneEntitiesByName>()
             .init_resource::<Events<SpawnedPartEvent>>()
             .add_plugins(CollectPartsPlugin)
-            .add_systems(OnEnter(AssetLoaderState::Done), spawn_scenes)
+            .add_systems(OnEnter(AssetLoaderState::Done), spawn_skeleton)
             .add_systems(
                 OnEnter(SpawnScenesState::Spawned),
                 (
@@ -54,15 +56,16 @@ impl Plugin for ModularCharacterPlugin {
                     paint_cubes_on_joints,
                 ),
             )
-            .add_systems(
-                OnEnter(SpawnScenesState::Done),
-                (run_animations, assemble_parts),
-            )
+            .add_systems(OnEnter(SpawnScenesState::Done), run_animations)
             .add_systems(
                 Update,
-                handle_part_change_request.run_if(in_state(SpawnScenesState::Done)),
-            )
-            // .add_systems(Update, attach_newly_spawned_parts)
-            ;
+                (
+                    handle_part_change_request,
+                    mark_scenes_as_loaded,
+                    // attach_newly_spawned_parts,
+                )
+                    .run_if(in_state(SpawnScenesState::Done)),
+            );
+        // .add_systems(Update, (mark_scenes_as_loaded, attach_newly_spawned_parts));
     }
 }

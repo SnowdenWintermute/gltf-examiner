@@ -18,7 +18,10 @@ pub struct SceneEntitiesByName(pub HashMap<String, Entity>);
 #[derive(Resource, Debug)]
 pub struct Animations(pub HashMap<String, Handle<AnimationClip>>);
 
-pub fn spawn_scenes(
+#[derive(Component, Debug)]
+pub struct SceneLoaded;
+
+pub fn spawn_skeleton(
     mut commands: Commands,
     asset_pack: Res<MyAssets>,
     assets_gltf: Res<Assets<Gltf>>,

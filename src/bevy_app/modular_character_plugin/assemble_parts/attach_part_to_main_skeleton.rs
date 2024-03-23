@@ -3,7 +3,6 @@ use crate::bevy_app::modular_character_plugin::{
         collect_bones::collect_bones,
         find_child_with_name_containing::find_child_with_name_containing,
     },
-    print_scene_tree::walk_tree,
     AttachedPartsReparentedEntities,
 };
 use bevy::{prelude::*, utils::HashMap};
@@ -19,7 +18,6 @@ pub fn attach_part_to_main_skeleton(
     main_skeleton_bones: &HashMap<String, Entity>,
     attached_parts_reparented_entities: &mut ResMut<AttachedPartsReparentedEntities>,
 ) {
-    walk_tree(all_entities_with_children, names, part_scene_entity, 0);
     info!("attaching part: {}", part_scene_name);
     let mut reparented_entities = Vec::new();
 
