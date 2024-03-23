@@ -1,12 +1,9 @@
-use super::{
-    spawn_scenes::SceneEntitiesByName, AttachedPartsReparentedEntities,
-    CharacterSpawnedPartSceneNamesByCategory,
-};
 use crate::{
     bevy_app::{
         asset_loader_plugin::MyAssets,
         modular_character_plugin::{
-            despawn_attached_part::despawn_attached_part, spawn_scenes::spawn_and_register_scene,
+            spawn_scenes::{spawn_and_register_scene, SceneEntitiesByName},
+            CharacterSpawnedPartSceneNamesByCategory,
         },
     },
     comm_channels::CharacterPartSelectionEvent,
@@ -14,10 +11,9 @@ use crate::{
 };
 use bevy::{gltf::Gltf, prelude::*};
 
-pub fn handle_part_change_request(
+pub fn spawn_new_parts(
     mut commands: Commands,
     mut part_selection_event_reader: EventReader<CharacterPartSelectionEvent>,
-    mut attached_parts_reparented_entities: ResMut<AttachedPartsReparentedEntities>,
     mut character_spawned_part_scene_names_by_category: ResMut<
         CharacterSpawnedPartSceneNamesByCategory,
     >,
@@ -26,7 +22,7 @@ pub fn handle_part_change_request(
     assets_gltf: Res<Assets<Gltf>>,
 ) {
     for event in part_selection_event_reader.read() {
-        info!("read part selection event: {:#?}", event);
+        info!("part spawner read part selection event: {:#?}", event);
         let file_name = &event.0.name;
         let category = &event.0.category;
 
@@ -38,22 +34,7 @@ pub fn handle_part_change_request(
         };
 
         if let Some(gltf_handle) = gltf_handle_option {
-            info!("handle: {:#?}", gltf_handle);
-            // DESPAWN ANY CURRENT PARTS OF REQUESTED CATEGORY
-            let current_part_in_category_option = character_spawned_part_scene_names_by_category
-                .0
-                .get(category);
-
-            if let Some(scene_name) = current_part_in_category_option {
-                despawn_attached_part(
-                    &mut commands,
-                    &scene_name,
-                    &mut attached_parts_reparented_entities,
-                    &mut scene_entities_by_name,
-                );
-            }
-
-            // SPAWN SCENE FOR THAT PART
+            // // SPAWN SCENE FOR THAT PART
             let part_scene_entity = spawn_and_register_scene(
                 &mut commands,
                 &assets_gltf,

@@ -1,4 +1,6 @@
-use super::{
+use bevy::{prelude::*, scene::SceneInstance};
+
+use crate::bevy_app::modular_character_plugin::{
     assemble_parts::{
         attach_part_to_main_skeleton::attach_part_to_main_skeleton,
         get_main_skeleton_bones_and_armature::get_main_skeleton_bones_and_armature,
@@ -6,7 +8,6 @@ use super::{
     spawn_scenes::{SceneEntitiesByName, SceneLoaded, SceneName},
     AttachedPartsReparentedEntities,
 };
-use bevy::{prelude::*, scene::SceneInstance};
 
 pub fn mark_scenes_as_loaded(
     mut commands: Commands,
@@ -22,27 +23,7 @@ pub fn mark_scenes_as_loaded(
         if scene_manager.instance_is_ready(**instance) {
             commands.entity(entity).insert(SceneLoaded);
             let name = &scene_name.0;
-            if scene_name.0 != "main_skeleton.glb" {
-                let (main_skeleton_bones, main_armature_entity) =
-                    get_main_skeleton_bones_and_armature(
-                        &scene_entities_by_name,
-                        &all_entities_with_children,
-                        &names,
-                    );
-
-                // ATTACH REQUESTED PART
-                attach_part_to_main_skeleton(
-                    &mut commands,
-                    &all_entities_with_children,
-                    &mut transforms,
-                    &names,
-                    &name,
-                    &entity,
-                    &main_armature_entity,
-                    &main_skeleton_bones,
-                    &mut attached_parts_reparented_entities,
-                );
-            }
+            // if scene_name.0 != "main_skeleton.glb"  {}
         }
     }
 }

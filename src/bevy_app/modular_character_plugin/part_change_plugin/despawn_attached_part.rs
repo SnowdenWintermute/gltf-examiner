@@ -1,5 +1,6 @@
-use super::spawn_scenes::SceneEntitiesByName;
-use crate::bevy_app::modular_character_plugin::AttachedPartsReparentedEntities;
+use crate::bevy_app::modular_character_plugin::{
+    spawn_scenes::SceneEntitiesByName, AttachedPartsReparentedEntities,
+};
 use bevy::prelude::*;
 
 pub fn despawn_attached_part(
@@ -8,6 +9,7 @@ pub fn despawn_attached_part(
     attached_parts_reparented_entities: &mut ResMut<AttachedPartsReparentedEntities>,
     scene_entities_by_name: &mut ResMut<SceneEntitiesByName>,
 ) {
+    // remove it from the scene_entities_by_name register
     if let Some(part_scene_entity) = scene_entities_by_name.0.remove(part_scene_name) {
         info!("despawing {:?}", part_scene_entity);
         // remove any entities in the scene that weren't reparented during part attachment
