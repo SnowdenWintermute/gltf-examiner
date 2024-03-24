@@ -10,7 +10,7 @@ pub fn character_part_selection_menu() -> Html {
     let (app_state, _) = use_store::<AppStore>();
 
     html!(
-        <ul>
+        <ul class="p-2 w-fit border border-slate-400 pointer-events-auto" >
         {app_state.parts_available.heads.iter()
             .map(|item| html!(
                 <li>
