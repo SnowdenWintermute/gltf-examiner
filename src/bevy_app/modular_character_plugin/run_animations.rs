@@ -1,8 +1,5 @@
-use super::{
-    link_animations::AnimationEntityLink,
-    spawn_character::{Animations, MainSkeletonEntity},
-    spawn_scenes::{SceneEntitiesByName, SceneName},
-};
+use super::{spawn_character::MainSkeletonEntity, spawn_scenes::SceneName, Animations};
+use crate::bevy_app::utils::link_animations::AnimationEntityLink;
 use bevy::prelude::*;
 
 pub fn run_animations(
@@ -12,10 +9,9 @@ pub fn run_animations(
         Added<AnimationEntityLink>,
     >,
     animations: Res<Animations>,
-    mut characters: Query<(Entity, &MainSkeletonEntity)>,
-    scene_entities_by_name: Res<SceneEntitiesByName>,
+    characters: Query<(Entity, &MainSkeletonEntity)>,
 ) {
-    for (entity, main_skeleton) in characters.iter() {
+    for (_, main_skeleton) in characters.iter() {
         let main_skeleton_scene_entity = main_skeleton.0;
 
         let (_, animation_player_entity_link) = scene_and_animation_player_link_query

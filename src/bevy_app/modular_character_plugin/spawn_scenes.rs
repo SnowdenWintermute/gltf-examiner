@@ -12,9 +12,6 @@ pub enum SpawnScenesState {
     Done,
 }
 
-#[derive(Resource, Debug, Default)]
-pub struct SceneEntitiesByName(pub HashMap<String, Entity>);
-
 #[derive(Component, Debug)]
 pub struct SceneLoaded;
 
@@ -24,11 +21,18 @@ pub fn spawn_scene(
     gltf_handle: Handle<Gltf>,
     name: String,
     animations_option: Option<&mut HashMap<String, Handle<AnimationClip>>>,
+    spawn_hidden: bool,
 ) -> Option<Entity> {
     if let Some(gltf) = assets_gltf.get(gltf_handle) {
+        let visibility = if spawn_hidden {
+            Visibility::Hidden
+        } else {
+            Visibility::Visible
+        };
         let entity_commands = commands.spawn((
             SceneBundle {
                 scene: gltf.named_scenes["Scene"].clone(),
+                visibility,
                 ..Default::default()
             },
             SceneName(name.clone()),

@@ -1,24 +1,22 @@
-use super::BonesAwaitingDespawn;
 use crate::bevy_app::modular_character_plugin::{
     assemble_parts::attach_part_to_main_skeleton::attach_part_to_main_skeleton,
     part_change_plugin::despawn_attached_part::despawn_attached_part,
     spawn_character::{
-        CharacterAttachedPartScenes, CharacterName, CharacterPartScenesAwaitingSpawn,
+        CharacterAttachedPartScenes, CharacterId, CharacterPartScenesAwaitingSpawn,
         MainSkeletonBonesAndArmature, MainSkeletonEntity,
     },
     spawn_scenes::{SceneLoaded, SceneName},
     AttachedPartsReparentedEntities,
 };
 use bevy::{prelude::*, scene::SceneInstance};
-use gloo::console::info;
 
 pub fn attach_newly_loaded_part_scenes(
     mut commands: Commands,
     scene_manager: Res<SceneSpawner>,
     unloaded_instances: Query<(Entity, &SceneInstance, &SceneName), Without<SceneLoaded>>,
-    mut characters: Query<(
+    mut character_query: Query<(
         Entity,
-        &CharacterName,
+        &CharacterId,
         &MainSkeletonEntity,
         &MainSkeletonBonesAndArmature,
         &mut CharacterPartScenesAwaitingSpawn,
@@ -28,72 +26,64 @@ pub fn attach_newly_loaded_part_scenes(
     all_entities_with_children: Query<&Children>,
     mut transforms: Query<&mut Transform>,
     names: Query<&Name>,
-    mut bones_awaiting_despawn: ResMut<BonesAwaitingDespawn>,
+    mut visibility_query: Query<&mut Visibility>,
 ) {
-    for (entity, instance, scene_name) in unloaded_instances.iter() {
-        if scene_manager.instance_is_ready(**instance) {
-            // MARK AS LOADED
-            commands.entity(entity).insert(SceneLoaded);
-            let name = &scene_name.0;
-            info!(format!("marked scene as loaded: {} {:?}", name, entity));
-
-            for (
-                character_entity,
-                character_name,
-                main_skeleton_entity,
-                main_skeleton_bones_and_armature,
-                mut awaiting_spawn,
-                mut attached,
-            ) in characters.iter_mut()
-            {
-                if entity == main_skeleton_entity.0 {
-                    continue;
-                }
-                info!(format!(
-                    "attaching to main skeleton entity: {:?}",
-                    main_skeleton_entity.0
-                ));
-                // ATTACH PART
-                attach_part_to_main_skeleton(
-                    &mut commands,
-                    &all_entities_with_children,
-                    &mut transforms,
-                    &names,
-                    &entity,
-                    &main_skeleton_bones_and_armature.1,
-                    &main_skeleton_bones_and_armature.0,
-                    &mut attached_parts_reparented_entities,
-                );
-                // REMOVE NEW PART FROM CHARACTER'S AWAITING SPAWN LIST
-                let mut matching_category = None;
-                for (category, entity_awaiting_spawn) in awaiting_spawn.0.iter() {
-                    info!(format!(
-                        "category: {:?}, entity_awaiting_spawn: {:?}",
-                        category, entity_awaiting_spawn
-                    ));
-                    if entity == *entity_awaiting_spawn {
-                        matching_category = Some(category.clone());
+    //  - for each character's list of parts awaiting spawn, check newly loaded scenes
+    for (
+        _,
+        _,
+        _,
+        main_skeleton_bones_and_armature,
+        mut parts_waiting_to_spawn,
+        mut attached_parts,
+    ) in character_query.iter_mut()
+    {
+        let mut spawned_parts = Vec::new();
+        // check for parts awaiting spawn
+        for (category, part_entities) in parts_waiting_to_spawn.0.iter() {
+            for part_entity in part_entities {
+                if let Ok((entity, instance, _)) = unloaded_instances.get(*part_entity) {
+                    if !scene_manager.instance_is_ready(**instance) {
+                        continue;
                     }
-                }
-                info!(format!("matching category: {:?}", matching_category));
-                if let Some(category) = matching_category {
-                    awaiting_spawn.0.remove(&category);
-                    // ADD NEW PART TO CHARACTER'S PART ENTITIES LIST
-                    // REMOVE OLD PART FROM CHARACTER'S PART ENTITIES LIST
-                    if let Some(old_part) = attached.0.remove(&category) {
-                        // DESPAWN OLD PART
+                    // mark as loaded
+                    commands.entity(*part_entity).insert(SceneLoaded);
+                    spawned_parts.push((category.clone(), *part_entity));
+
+                    //    - despawn any currently attached part in that category
+                    if let Some(old_part) = attached_parts.0.remove(category) {
                         despawn_attached_part(
                             &mut commands,
                             &old_part,
                             &mut attached_parts_reparented_entities,
-                            &all_entities_with_children,
-                            &names,
-                            &mut bones_awaiting_despawn,
                         );
                     };
-                    attached.0.insert(category.clone(), entity);
+                    //    - add newly spawned part to character's list of attached parts
+                    attached_parts.0.insert(category.clone(), entity);
+                    //    - attach newly spawned part to character's skeleton bones
+                    attach_part_to_main_skeleton(
+                        &mut commands,
+                        &all_entities_with_children,
+                        &mut transforms,
+                        &names,
+                        &entity,
+                        &main_skeleton_bones_and_armature.1,
+                        &main_skeleton_bones_and_armature.0,
+                        &mut attached_parts_reparented_entities,
+                        &mut visibility_query,
+                    );
+                    //    - make character armature visible
                 }
             }
+        }
+
+        // remove from character's list of parts awaiting spawn
+        for (category, spawned_part_entity) in spawned_parts {
+            let parts_in_category = parts_waiting_to_spawn
+                .0
+                .get_mut(&category)
+                .expect("to have this category");
+            parts_in_category.remove(&spawned_part_entity);
         }
     }
 }

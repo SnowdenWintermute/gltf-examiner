@@ -19,6 +19,7 @@ pub fn attach_part_to_main_skeleton(
     main_armature_entity: &Entity,
     main_skeleton_bones: &HashMap<String, Entity>,
     attached_parts_reparented_entities: &mut ResMut<AttachedPartsReparentedEntities>,
+    visibility_query: &mut Query<&mut Visibility>,
 ) {
     let mut reparented_entities = Vec::new();
 
@@ -36,14 +37,20 @@ pub fn attach_part_to_main_skeleton(
         "CharacterArmature",
     );
 
-    // info!("part root bone: {:?}", root_bone_option);
-    // info!("part armature: {:?}", part_armature_option);
-
     if let Some(part_armature) = part_armature_option {
         let mut part_armature_entity_commands = commands.entity(part_armature);
         zero_transform(part_armature, transforms);
         reparented_entities.push(part_armature);
         part_armature_entity_commands.set_parent(*main_armature_entity);
+        // set visibility
+        if let Ok(mut visibility) = visibility_query.get_mut(part_armature) {
+            info!(
+                "changing visibility for {:?}, was {:?}",
+                names.get(*part_scene_entity),
+                visibility
+            );
+            *visibility = Visibility::Visible;
+        }
     }
 
     if let Some(root_bone) = root_bone_option {
@@ -71,4 +78,3 @@ pub fn attach_part_to_main_skeleton(
             .insert(*part_scene_entity, reparented_entities);
     }
 }
-

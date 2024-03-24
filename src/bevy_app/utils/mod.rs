@@ -1,3 +1,8 @@
+pub mod link_animations;
+mod mark_scenes_as_loaded;
+pub mod paint_cubes_on_scene_children;
+pub mod print_scene_tree;
+
 use bevy::prelude::*;
 pub fn zero_transform(entity: Entity, transforms: &mut Query<&mut Transform>) {
     if let Ok(mut transform) = transforms.get_mut(entity) {

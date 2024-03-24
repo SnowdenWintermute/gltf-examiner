@@ -1,4 +1,4 @@
-use super::spawn_scenes::SpawnScenesState;
+use crate::bevy_app::modular_character_plugin::spawn_scenes::SpawnScenesState;
 use bevy::prelude::*;
 
 #[derive(Component, Debug)]
@@ -49,4 +49,3 @@ pub fn link_animations(
 
     next_state.set(SpawnScenesState::Done)
 }
-
