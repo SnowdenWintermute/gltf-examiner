@@ -20,27 +20,24 @@ pub fn attach_newly_spawned_parts(
     mut transforms: Query<&mut Transform>,
     names: Query<&Name>,
 ) {
-    for (entity, scene_name) in recently_loaded_scenes_query.iter() {
-        info!("part attacher attaching: {:#?} {}", entity, scene_name.0);
-        if scene_name.0 != "main_skeleton.glb" {
-            let (main_skeleton_bones, main_armature_entity) = get_main_skeleton_bones_and_armature(
-                &scene_entities_by_name,
-                &all_entities_with_children,
-                &names,
-            );
+    // for (entity, scene_name) in recently_loaded_scenes_query.iter() {
+    //     info!("part attacher attaching: {:#?} {}", entity, scene_name.0);
+    //     if scene_name.0 != "main_skeleton.glb" {
+    //         let (main_skeleton_bones, main_armature_entity) =
+    //             get_main_skeleton_bones_and_armature(&entity, &all_entities_with_children, &names);
 
-            // ATTACH REQUESTED PART
-            attach_part_to_main_skeleton(
-                &mut commands,
-                &all_entities_with_children,
-                &mut transforms,
-                &names,
-                &scene_name.0,
-                &entity,
-                &main_armature_entity,
-                &main_skeleton_bones,
-                &mut attached_parts_reparented_entities,
-            );
-        }
-    }
+    //         // ATTACH REQUESTED PART
+    //         attach_part_to_main_skeleton(
+    //             &mut commands,
+    //             &all_entities_with_children,
+    //             &mut transforms,
+    //             &names,
+    //             &scene_name.0,
+    //             &entity,
+    //             &main_armature_entity,
+    //             &main_skeleton_bones,
+    //             &mut attached_parts_reparented_entities,
+    //         );
+    //     }
+    // }
 }

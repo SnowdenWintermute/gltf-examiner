@@ -15,7 +15,6 @@ pub fn attach_part_to_main_skeleton(
     all_entities_with_children: &Query<&Children>,
     transforms: &mut Query<&mut Transform>,
     names: &Query<&Name>,
-    part_scene_name: &String,
     part_scene_entity: &Entity,
     main_armature_entity: &Entity,
     main_skeleton_bones: &HashMap<String, Entity>,
