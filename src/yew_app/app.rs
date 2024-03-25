@@ -23,8 +23,6 @@ pub fn app(props: &Props) -> Html {
         cloned_dispatch.reduce_mut(|store| store.transmitter_option = Some(cloned_transmitter))
     });
 
-    let counter_state = use_state(|| 0);
-    let transmitter = yew_transmitter.clone();
     // let name = shared.lock().unwrap().name.clone();
     let most_recent_message_from_bevy_state = use_state(|| Vec::new());
     let queued_bevy_messages_state: UseStateHandle<Vec<MessageFromBevy>> = use_state(|| Vec::new());

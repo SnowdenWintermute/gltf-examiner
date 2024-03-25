@@ -1,6 +1,8 @@
 mod app;
 mod character_part_selection_menu;
+mod character_select_input;
 mod select_character_part_button;
+mod spawn_character_button;
 mod store;
 use self::app::App;
 use crate::comm_channels::BevyTransmitter;

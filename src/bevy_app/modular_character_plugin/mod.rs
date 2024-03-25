@@ -1,16 +1,15 @@
 use self::{
     assign_skeleton_bones_to_characters::assign_skeleton_bones_to_characters,
-    part_change_plugin::PartChangePlugin, run_animations::run_animations,
-    spawn_character::spawn_character, spawn_scenes::SpawnScenesState,
+    part_change_plugin::PartChangePlugin, register_animations::register_animations,
+    run_animations::run_animations, spawn_character::spawn_character,
 };
-use super::utils::{
-    link_animations::link_animations, paint_cubes_on_scene_children::paint_cubes_on_scene_children,
-};
+use super::utils::link_animations::link_animations;
 use crate::bevy_app::asset_loader_plugin::AssetLoaderState;
 use bevy::{prelude::*, utils::HashMap};
 mod assemble_parts;
 mod assign_skeleton_bones_to_characters;
 pub mod part_change_plugin;
+mod register_animations;
 mod run_animations;
 mod spawn_character;
 pub mod spawn_scenes;
@@ -28,22 +27,33 @@ pub struct CharactersById(pub HashMap<CharacterId, Entity>);
 pub struct AttachedPartsReparentedEntities {
     parts_and_entities: HashMap<Entity, Vec<Entity>>,
 }
+#[derive(Resource, Default)]
+pub struct NextCharacterXLocation(f32);
 
 pub struct ModularCharacterPlugin;
 impl Plugin for ModularCharacterPlugin {
     fn build(&self, app: &mut App) {
-        app.init_state::<SpawnScenesState>()
-            .init_resource::<AttachedPartsReparentedEntities>()
+        app.init_resource::<AttachedPartsReparentedEntities>()
             .init_resource::<CharactersById>()
             .init_resource::<SkeletonsAwaitingCharacterAssignment>()
             .init_resource::<Animations>()
+            .init_resource::<NextCharacterXLocation>()
             .add_plugins(PartChangePlugin)
-            .add_systems(OnEnter(AssetLoaderState::Done), spawn_character)
-            .add_systems(Update, assign_skeleton_bones_to_characters)
             .add_systems(
-                OnEnter(SpawnScenesState::AwaitingAnimations),
-                (link_animations, paint_cubes_on_scene_children),
+                OnEnter(AssetLoaderState::RegisteringAnimations),
+                register_animations,
             )
-            .add_systems(OnEnter(SpawnScenesState::Done), run_animations);
+            .add_systems(
+                Update,
+                spawn_character.run_if(in_state(AssetLoaderState::Done)),
+            )
+            .add_systems(
+                Update,
+                (
+                    assign_skeleton_bones_to_characters,
+                    link_animations,
+                    run_animations,
+                ),
+            );
     }
 }

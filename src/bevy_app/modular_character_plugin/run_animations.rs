@@ -1,4 +1,4 @@
-use super::{spawn_character::MainSkeletonEntity, spawn_scenes::SceneName, Animations};
+use super::{spawn_scenes::SceneName, Animations};
 use crate::bevy_app::utils::link_animations::AnimationEntityLink;
 use bevy::prelude::*;
 
@@ -9,15 +9,8 @@ pub fn run_animations(
         Added<AnimationEntityLink>,
     >,
     animations: Res<Animations>,
-    characters: Query<(Entity, &MainSkeletonEntity)>,
 ) {
-    for (_, main_skeleton) in characters.iter() {
-        let main_skeleton_scene_entity = main_skeleton.0;
-
-        let (_, animation_player_entity_link) = scene_and_animation_player_link_query
-            .get(main_skeleton_scene_entity)
-            .expect("the scene to exist");
-
+    for (_, animation_player_entity_link) in scene_and_animation_player_link_query.iter() {
         let mut animation_player = animation_player_query
             .get_mut(animation_player_entity_link.0)
             .expect("to have an animation player on the main skeleton");
@@ -35,8 +28,4 @@ pub fn run_animations(
             .repeat()
             .set_speed(0.5);
     }
-    // let main_skeleton_scene_entity = scene_entities_by_name
-    //     .0
-    //     .get("main_skeleton.glb")
-    //     .expect("the scene to be registered");
 }

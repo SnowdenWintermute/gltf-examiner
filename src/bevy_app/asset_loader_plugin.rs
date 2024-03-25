@@ -6,6 +6,7 @@ use bevy_asset_loader::prelude::*;
 pub enum AssetLoaderState {
     #[default]
     Loading,
+    RegisteringAnimations,
     Done,
 }
 
@@ -14,7 +15,7 @@ impl Plugin for AssetLoaderPlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<AssetLoaderState>().add_loading_state(
             LoadingState::new(AssetLoaderState::Loading)
-                .continue_to_state(AssetLoaderState::Done)
+                .continue_to_state(AssetLoaderState::RegisteringAnimations)
                 .load_collection::<MyAssets>(),
         );
     }

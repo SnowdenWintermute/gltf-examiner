@@ -6,7 +6,6 @@ use self::{
     attach_newly_loaded_part_scenes::attach_newly_loaded_part_scenes,
     send_part_names_to_yew::send_part_names_to_yew, spawn_new_parts::spawn_new_parts,
 };
-use super::spawn_scenes::SpawnScenesState;
 use crate::bevy_app::asset_loader_plugin::AssetLoaderState;
 use bevy::prelude::*;
 
@@ -20,7 +19,7 @@ impl Plugin for PartChangePlugin {
                     ((spawn_new_parts, attach_newly_loaded_part_scenes).chain())
                     // mark_scenes_as_loaded,
                 )
-                .run_if(in_state(SpawnScenesState::Done)),
+                .run_if(in_state(AssetLoaderState::Done)),
             );
     }
 }

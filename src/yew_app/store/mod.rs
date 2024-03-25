@@ -5,4 +5,7 @@ use yewdux::Store;
 pub struct AppStore {
     pub transmitter_option: Option<YewTransmitter>,
     pub parts_available: PartsByName,
+    pub next_character_id: u32,
+    pub selected_character_id: u32,
+    pub character_ids: Vec<u32>,
 }

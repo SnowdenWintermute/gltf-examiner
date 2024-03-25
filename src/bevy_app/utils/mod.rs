@@ -1,3 +1,5 @@
+pub mod collect_hierarchy;
+pub mod find_child_with_name_containing;
 pub mod link_animations;
 mod mark_scenes_as_loaded;
 pub mod paint_cubes_on_scene_children;

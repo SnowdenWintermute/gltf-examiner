@@ -24,6 +24,7 @@ pub fn select_character_part_button(props: &Props) -> Html {
             transmitter
                 .send(MessageFromYew::SelectCharacterPart(
                     CharacterPartSelection {
+                        character_id: app_state.selected_character_id,
                         name: name_to_send.clone(),
                         category: category.clone(),
                     },

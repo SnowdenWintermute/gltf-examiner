@@ -1,12 +1,9 @@
 use crate::bevy_app::{
-    modular_character_plugin::{
-        assemble_parts::{
-            collect_bones::collect_bones,
-            find_child_with_name_containing::find_child_with_name_containing,
-        },
-        AttachedPartsReparentedEntities,
+    modular_character_plugin::AttachedPartsReparentedEntities,
+    utils::{
+        collect_hierarchy::get_all_named_entities_in_hierarchy,
+        find_child_with_name_containing::find_child_with_name_containing, zero_transform,
     },
-    utils::zero_transform,
 };
 use bevy::{prelude::*, utils::HashMap};
 
@@ -54,13 +51,8 @@ pub fn attach_part_to_main_skeleton(
     }
 
     if let Some(root_bone) = root_bone_option {
-        let mut part_bones = HashMap::new();
-        collect_bones(
-            all_entities_with_children,
-            names,
-            &root_bone,
-            &mut part_bones,
-        );
+        let part_bones =
+            get_all_named_entities_in_hierarchy(all_entities_with_children, names, &root_bone);
 
         for (name, part_bone) in part_bones {
             let mut entity_commands = commands.entity(part_bone);

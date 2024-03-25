@@ -39,10 +39,18 @@ pub fn spawn_new_parts(
             CharacterPartCategories::Weapon => asset_pack.weapons.get(file_name),
         };
 
+        let character_id = event.0.character_id;
         //  - get associated character
-        let character_entity = character_by_id.0.get(&0).expect("to have this character");
+        let character_entity = character_by_id
+            .0
+            .get(&event.0.character_id)
+            .expect("to have a character by this id");
+        info!(
+            "spawning part for character id: {}, entity: {:?}",
+            character_id, character_entity
+        );
         // ensure it has an assigned skeleton
-        if let Ok((_, _, mut parts_awaiting_spawn, skeleton_bones_and_armature)) =
+        if let Ok((_, _, mut parts_awaiting_spawn, _)) =
             characters_with_spawned_skeletons.get_mut(*character_entity)
         {
             //  - spawn new part and store entity id and category on character "awaiting spawn"
@@ -52,8 +60,8 @@ pub fn spawn_new_parts(
                 &assets_gltf,
                 gltf_handle.clone(),
                 file_name.clone(),
-                None,
                 true,
+                0.0,
             )
             .expect("to spawn the scene");
             info!("spawned part scene: {:?}", part_scene_entity);

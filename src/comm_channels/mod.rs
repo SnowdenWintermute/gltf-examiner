@@ -1,4 +1,5 @@
 pub mod comm_channel_bevy_plugin;
+use crate::bevy_app::modular_character_plugin::CharacterId;
 use crate::frontend_common::CharacterPartSelection;
 use crate::frontend_common::PartsByName;
 use bevy::prelude::*;
@@ -11,6 +12,7 @@ use tokio::sync::broadcast;
 pub enum MessageFromYew {
     Text(TextFromYewEvent),
     SelectCharacterPart(CharacterPartSelection),
+    SpawnCharacter(CharacterId),
 }
 #[derive(Clone, Debug, Event)]
 pub struct TextFromYewEvent {
@@ -18,6 +20,10 @@ pub struct TextFromYewEvent {
 }
 #[derive(Clone, Debug, Event)]
 pub struct CharacterPartSelectionEvent(pub CharacterPartSelection);
+
+#[derive(Clone, Debug, Event)]
+pub struct CharacterSpawnEvent(pub CharacterId);
+
 // BEVY MESSAGES
 #[derive(Debug, Clone, PartialEq)]
 pub enum MessageFromBevy {

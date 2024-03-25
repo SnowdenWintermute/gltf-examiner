@@ -1,3 +1,4 @@
+use crate::bevy_app::modular_character_plugin::CharacterId;
 use std::collections::HashSet;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -18,6 +19,7 @@ pub struct PartsByName {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CharacterPartSelection {
+    pub character_id: CharacterId,
     pub name: String,
     pub category: CharacterPartCategories,
 }
