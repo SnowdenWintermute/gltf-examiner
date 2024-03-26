@@ -13,6 +13,11 @@ use yewdux::use_store;
 pub fn character_part_selection_menu() -> Html {
     let (app_state, _) = use_store::<AppStore>();
 
+    // let cloned_app_state = app_state.clone();
+    // use_effect(move || {
+    //     format!("{:#?}", cloned_app_state.parts_available);
+    // });
+
     html!(
         <ul class="p-2 w-fit border border-slate-400 pointer-events-auto" >
         <li>
@@ -21,6 +26,7 @@ pub fn character_part_selection_menu() -> Html {
         <li>
             <SpawnCharacterButton />
         </li>
+        {app_state.animation_names.iter().map(|item| html!(<li>{item}</li>)).collect::<Html>()}
         {app_state.parts_available.heads.iter()
             .map(|item| html!(
                 <li>

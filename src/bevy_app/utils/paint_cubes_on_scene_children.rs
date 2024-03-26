@@ -1,3 +1,4 @@
+#![allow(unused)]
 use crate::bevy_app::{
     asset_loader_plugin::MyAssets, modular_character_plugin::spawn_scenes::SceneName,
 };

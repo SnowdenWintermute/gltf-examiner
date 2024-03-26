@@ -1,6 +1,6 @@
 use super::{store::AppStore, Props};
 use crate::{
-    comm_channels::{MessageFromBevy, MessageFromYew, TextFromYewEvent},
+    comm_channels::MessageFromBevy,
     yew_app::character_part_selection_menu::CharacterPartSelectionMenu,
 };
 use gloo::console::log;
@@ -10,11 +10,9 @@ use yewdux::use_store;
 
 #[function_component(App)]
 pub fn app(props: &Props) -> Html {
-    let (app_state, dispatch) = use_store::<AppStore>();
+    let (_, dispatch) = use_store::<AppStore>();
     let Props {
-        transmitter: yew_transmitter,
-        bevy_transmitter,
-        shared,
+        bevy_transmitter, ..
     } = props;
 
     let cloned_transmitter = props.transmitter.clone();
@@ -31,20 +29,12 @@ pub fn app(props: &Props) -> Html {
     let mut receiver = bevy_transmitter.subscribe();
     use_effect_with((), {
         let most_recent_message_from_bevy_state = most_recent_message_from_bevy_state.clone();
-        let dispatch = dispatch.clone();
         move |()| {
             let most_recent_message_from_bevy_state = most_recent_message_from_bevy_state.clone();
-            let dispatch = dispatch.clone();
             spawn_local(async move {
                 while let Ok(message) = receiver.recv().await {
                     log!(format!("got message from bevy: {:#?}", message));
                     most_recent_message_from_bevy_state.set(Vec::from([message.clone()]));
-                    match message {
-                        MessageFromBevy::Text(_) => todo!(),
-                        MessageFromBevy::PartNames(part_names) => {
-                            dispatch.reduce_mut(|store| store.parts_available = part_names)
-                        }
-                    }
                 }
             });
         }
@@ -60,6 +50,25 @@ pub fn app(props: &Props) -> Html {
         cloned_queued_bevy_messages_state.set(current_messages);
         cloned_most_recent_message_from_bevy_state.set(Vec::new());
     });
+
+    // DEQUEUE AND HANDLE MESSAGES
+    let cloned_queued_bevy_messages_state = queued_bevy_messages_state.clone();
+    let cloned_dispatch = dispatch.clone();
+    use_effect_with(
+        cloned_queued_bevy_messages_state.clone(),
+        move |cloned_queued_bevy_messages_state| {
+            let messages = cloned_queued_bevy_messages_state.deref();
+            for message in messages {
+                match message {
+                    MessageFromBevy::PartNames(part_names) => cloned_dispatch
+                        .reduce_mut(|store| store.parts_available = part_names.clone()),
+                    MessageFromBevy::AnimationsAvailable(animation_names) => cloned_dispatch
+                        .reduce_mut(|store| store.animation_names = animation_names.clone()),
+                }
+            }
+            cloned_queued_bevy_messages_state.set(Vec::new());
+        },
+    );
 
     html! {
         <main class="text-zinc-300" >

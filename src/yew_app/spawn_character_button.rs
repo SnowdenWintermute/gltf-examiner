@@ -14,6 +14,7 @@ pub fn spawn_character_button() -> Html {
                     .send(MessageFromYew::SpawnCharacter(store.next_character_id))
                     .expect("could not send event");
                 store.character_ids.push(store.next_character_id);
+                store.selected_character_id = cloned_app_state.next_character_id;
                 store.next_character_id += 1;
             });
         }

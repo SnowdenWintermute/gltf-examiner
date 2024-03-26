@@ -1,7 +1,7 @@
 mod attach_newly_loaded_part_scenes;
 mod despawn_attached_part;
 pub mod send_part_names_to_yew;
-mod spawn_new_parts;
+pub mod spawn_new_parts;
 use self::{
     attach_newly_loaded_part_scenes::attach_newly_loaded_part_scenes,
     send_part_names_to_yew::send_part_names_to_yew, spawn_new_parts::spawn_new_parts,
@@ -16,7 +16,7 @@ impl Plugin for PartChangePlugin {
             .add_systems(
                 Update,
                 (
-                    ((spawn_new_parts, attach_newly_loaded_part_scenes).chain())
+                    (spawn_new_parts, attach_newly_loaded_part_scenes).chain()
                     // mark_scenes_as_loaded,
                 )
                 .run_if(in_state(AssetLoaderState::Done)),

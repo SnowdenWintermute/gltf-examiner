@@ -32,13 +32,6 @@ pub fn spawn_new_parts(
         let file_name = &event.0.name;
         let category = &event.0.category;
 
-        let gltf_handle_option = match category {
-            CharacterPartCategories::Head => asset_pack.heads.get(file_name),
-            CharacterPartCategories::Torso => asset_pack.torsos.get(file_name),
-            CharacterPartCategories::Leg => asset_pack.legs.get(file_name),
-            CharacterPartCategories::Weapon => asset_pack.weapons.get(file_name),
-        };
-
         let character_id = event.0.character_id;
         //  - get associated character
         let character_entity = character_by_id
@@ -53,24 +46,48 @@ pub fn spawn_new_parts(
         if let Ok((_, _, mut parts_awaiting_spawn, _)) =
             characters_with_spawned_skeletons.get_mut(*character_entity)
         {
-            //  - spawn new part and store entity id and category on character "awaiting spawn"
-            let gltf_handle = gltf_handle_option.expect("to have loaded the gltf file asset");
-            let part_scene_entity = spawn_scene(
+            spawn_part(
+                &file_name,
+                &category,
                 &mut commands,
+                &asset_pack,
                 &assets_gltf,
-                gltf_handle.clone(),
-                file_name.clone(),
-                true,
-                0.0,
+                &mut parts_awaiting_spawn,
             )
-            .expect("to spawn the scene");
-            info!("spawned part scene: {:?}", part_scene_entity);
-
-            parts_awaiting_spawn
-                .0
-                .entry(category.clone())
-                .or_default()
-                .insert(part_scene_entity);
         }
     }
+}
+
+pub fn spawn_part(
+    file_name: &String,
+    category: &CharacterPartCategories,
+    commands: &mut Commands,
+    asset_pack: &Res<MyAssets>,
+    assets_gltf: &Res<Assets<Gltf>>,
+    parts_awaiting_spawn: &mut CharacterPartScenesAwaitingSpawn,
+) {
+    let gltf_handle_option = match category {
+        CharacterPartCategories::Head => asset_pack.heads.get(file_name),
+        CharacterPartCategories::Torso => asset_pack.torsos.get(file_name),
+        CharacterPartCategories::Leg => asset_pack.legs.get(file_name),
+        CharacterPartCategories::Weapon => asset_pack.weapons.get(file_name),
+    };
+    //  - spawn new part and store entity id and category on character "awaiting spawn"
+    let gltf_handle = gltf_handle_option.expect("to have loaded the gltf file asset");
+    let part_scene_entity = spawn_scene(
+        commands,
+        assets_gltf,
+        gltf_handle.clone(),
+        file_name.clone(),
+        true,
+        0.0,
+    )
+    .expect("to spawn the scene");
+    info!("spawned part scene: {:?}", part_scene_entity);
+
+    parts_awaiting_spawn
+        .0
+        .entry(category.clone())
+        .or_default()
+        .insert(part_scene_entity);
 }

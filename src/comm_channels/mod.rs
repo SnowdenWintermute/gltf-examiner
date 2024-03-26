@@ -1,4 +1,6 @@
 pub mod comm_channel_bevy_plugin;
+use std::collections::HashSet;
+
 use crate::bevy_app::modular_character_plugin::CharacterId;
 use crate::frontend_common::CharacterPartSelection;
 use crate::frontend_common::PartsByName;
@@ -10,7 +12,6 @@ use tokio::sync::broadcast;
 // YEW MESSAGES
 #[derive(Debug, Clone)]
 pub enum MessageFromYew {
-    Text(TextFromYewEvent),
     SelectCharacterPart(CharacterPartSelection),
     SpawnCharacter(CharacterId),
 }
@@ -27,8 +28,8 @@ pub struct CharacterSpawnEvent(pub CharacterId);
 // BEVY MESSAGES
 #[derive(Debug, Clone, PartialEq)]
 pub enum MessageFromBevy {
-    Text(String),
     PartNames(PartsByName),
+    AnimationsAvailable(HashSet<String>),
 }
 // CHANNELS
 #[derive(Clone, Resource, Deref)]
@@ -36,8 +37,9 @@ pub struct YewTransmitter(pub Sender<MessageFromYew>);
 #[derive(Resource, Deref, DerefMut)]
 pub struct YewReceiver(pub Receiver<MessageFromBevy>);
 
+// required so it can be passed as yew Props
 impl PartialEq for YewTransmitter {
-    fn eq(&self, other: &Self) -> bool {
+    fn eq(&self, _other: &Self) -> bool {
         true
     }
 }
@@ -61,5 +63,4 @@ pub fn create_comm_channels() -> (
             BevyReceiver(bevy_receiver),
         ),
     )
-    //
 }

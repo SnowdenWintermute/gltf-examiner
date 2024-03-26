@@ -1,3 +1,4 @@
+#![allow(unused)]
 use bevy::{prelude::*, scene::SceneInstance};
 use gloo::console::info;
 

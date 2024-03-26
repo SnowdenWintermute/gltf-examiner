@@ -14,7 +14,7 @@ pub struct Props {
 
 #[function_component(SelectCharacterPartButton)]
 pub fn select_character_part_button(props: &Props) -> Html {
-    let (app_state, dispatch) = use_store::<AppStore>();
+    let (app_state, _) = use_store::<AppStore>();
 
     let name_to_send = props.name.to_string();
     let cloned_app_state = app_state.clone();

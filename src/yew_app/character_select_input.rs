@@ -21,8 +21,11 @@ pub fn character_select_input() -> Html {
     });
 
     html!(
-    <select onchange={handle_change} >
-        {app_state.character_ids.iter().map(|item| html!(<option>{ *item }</option>)).collect::<Vec<Html>>()}
+    <select
+        class="h-10 border border-slate-400 bg-slate-700 text-zinc-300"
+        onchange={handle_change} value={format!("{}", app_state.selected_character_id )}
+        >
+        {app_state.character_ids.iter().enumerate().map(|( id, item )| html!(<option value={format!("{}",id)}>{ *item }</option>)).collect::<Vec<Html>>()}
     </select>
     )
 }

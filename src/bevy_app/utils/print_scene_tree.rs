@@ -1,3 +1,4 @@
+#![allow(unused)]
 use bevy::prelude::*;
 
 use crate::bevy_app::modular_character_plugin::spawn_scenes::SceneName;

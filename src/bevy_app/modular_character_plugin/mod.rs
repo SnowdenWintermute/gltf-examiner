@@ -45,15 +45,13 @@ impl Plugin for ModularCharacterPlugin {
             )
             .add_systems(
                 Update,
-                spawn_character.run_if(in_state(AssetLoaderState::Done)),
-            )
-            .add_systems(
-                Update,
                 (
+                    spawn_character,
                     assign_skeleton_bones_to_characters,
                     link_animations,
                     run_animations,
-                ),
+                )
+                    .run_if(in_state(AssetLoaderState::Done)),
             );
     }
 }
