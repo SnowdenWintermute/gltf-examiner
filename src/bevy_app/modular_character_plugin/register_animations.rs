@@ -32,7 +32,7 @@ pub fn register_animations(
         animation_names_for_yew.insert(named_animation.0.clone());
     }
 
-    transmitter.0.send(MessageFromBevy::AnimationsAvailable(
+    let _ = transmitter.0.send(MessageFromBevy::AnimationsAvailable(
         animation_names_for_yew,
     ));
 

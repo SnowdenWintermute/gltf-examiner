@@ -6,7 +6,7 @@ use bevy::{gltf::Gltf, prelude::*, utils::HashMap, utils::HashSet};
 
 // CHARACTER COMPONENTS
 #[derive(Component)]
-pub struct CharacterId(pub u32);
+pub struct CharacterIdComponent(pub u32);
 #[derive(Component, Debug)]
 pub struct MainSkeletonEntity(pub Entity);
 #[derive(Component, Debug)]
@@ -44,6 +44,7 @@ pub fn spawn_character(
             next_character_x_location.0,
         )
         .expect("to have a skeleton gltf handle");
+
         next_character_x_location.0 += 1.0;
         // - add skeleton entity to skeletons_awaiting_character_assignment resource
         skeletons_awaiting_character_assignment
@@ -51,15 +52,18 @@ pub fn spawn_character(
             .insert(character_id, skeleton_entity);
 
         let character_entity_commands = commands.spawn((
-            CharacterId(character_id),
+            CharacterIdComponent(character_id),
             MainSkeletonEntity(skeleton_entity),
             CharacterAttachedPartScenes(HashMap::new()),
             CharacterPartScenesAwaitingSpawn(HashMap::new()),
         ));
-
+        let character_entity = character_entity_commands.id();
         // - add character id to list of characters resource
         characters_by_id
             .0
             .insert(character_id, character_entity_commands.id());
+
+        // let mut skeleton_entity_commands = commands.entity(skeleton_entity);
+        // skeleton_entity_commands.set_parent(character_entity);
     }
 }

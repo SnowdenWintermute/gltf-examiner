@@ -1,6 +1,5 @@
 use crate::{
-    comm_channels::MessageFromYew,
-    frontend_common::{CharacterPartCategories, CharacterPartSelection},
+    comm_channels::MessageFromYew, frontend_common::CharacterAnimationSelection,
     yew_app::store::AppStore,
 };
 use yew::prelude::*;
@@ -9,24 +8,21 @@ use yewdux::use_store;
 #[derive(Properties, PartialEq, Eq)]
 pub struct Props {
     pub name: AttrValue,
-    pub category: CharacterPartCategories,
 }
 
-#[function_component(SelectCharacterPartButton)]
-pub fn select_character_part_button(props: &Props) -> Html {
+#[function_component(SelectAnimationButton)]
+pub fn select_animation_button(props: &Props) -> Html {
     let (app_state, _) = use_store::<AppStore>();
 
     let name_to_send = props.name.to_string();
     let cloned_app_state = app_state.clone();
-    let category = props.category.clone();
     let handle_click = Callback::from(move |_| {
         if let Some(transmitter) = &cloned_app_state.transmitter_option {
             transmitter
-                .send(MessageFromYew::SelectCharacterPart(
-                    CharacterPartSelection {
-                        character_id: app_state.selected_character_id,
+                .send(MessageFromYew::SelectAnimation(
+                    CharacterAnimationSelection {
                         name: name_to_send.clone(),
-                        category: category.clone(),
+                        character_id: cloned_app_state.selected_character_id,
                     },
                 ))
                 .expect("could not send event");

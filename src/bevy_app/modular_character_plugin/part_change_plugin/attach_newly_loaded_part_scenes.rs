@@ -2,7 +2,7 @@ use crate::bevy_app::modular_character_plugin::{
     assemble_parts::attach_part_to_main_skeleton::attach_part_to_main_skeleton,
     part_change_plugin::despawn_attached_part::despawn_attached_part,
     spawn_character::{
-        CharacterAttachedPartScenes, CharacterId, CharacterPartScenesAwaitingSpawn,
+        CharacterAttachedPartScenes, CharacterIdComponent, CharacterPartScenesAwaitingSpawn,
         MainSkeletonBonesAndArmature, MainSkeletonEntity,
     },
     spawn_scenes::{SceneLoaded, SceneName},
@@ -16,7 +16,7 @@ pub fn attach_newly_loaded_part_scenes(
     unloaded_instances: Query<(Entity, &SceneInstance, &SceneName), Without<SceneLoaded>>,
     mut character_query: Query<(
         Entity,
-        &CharacterId,
+        &CharacterIdComponent,
         &MainSkeletonEntity,
         &MainSkeletonBonesAndArmature,
         &mut CharacterPartScenesAwaitingSpawn,

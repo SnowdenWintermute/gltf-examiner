@@ -23,3 +23,9 @@ pub struct CharacterPartSelection {
     pub name: String,
     pub category: CharacterPartCategories,
 }
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct CharacterAnimationSelection {
+    pub character_id: CharacterId,
+    pub name: String,
+}

@@ -1,12 +1,12 @@
 pub mod comm_channel_bevy_plugin;
-use std::collections::HashSet;
-
 use crate::bevy_app::modular_character_plugin::CharacterId;
+use crate::frontend_common::CharacterAnimationSelection;
 use crate::frontend_common::CharacterPartSelection;
 use crate::frontend_common::PartsByName;
 use bevy::prelude::*;
 use broadcast::Receiver;
 use broadcast::Sender;
+use std::collections::HashSet;
 use tokio::sync::broadcast;
 
 // YEW MESSAGES
@@ -14,16 +14,16 @@ use tokio::sync::broadcast;
 pub enum MessageFromYew {
     SelectCharacterPart(CharacterPartSelection),
     SpawnCharacter(CharacterId),
-}
-#[derive(Clone, Debug, Event)]
-pub struct TextFromYewEvent {
-    pub text: String,
+    SelectAnimation(CharacterAnimationSelection),
 }
 #[derive(Clone, Debug, Event)]
 pub struct CharacterPartSelectionEvent(pub CharacterPartSelection);
 
 #[derive(Clone, Debug, Event)]
 pub struct CharacterSpawnEvent(pub CharacterId);
+
+#[derive(Clone, Debug, Event)]
+pub struct SelectAnimationEvent(pub CharacterAnimationSelection);
 
 // BEVY MESSAGES
 #[derive(Debug, Clone, PartialEq)]

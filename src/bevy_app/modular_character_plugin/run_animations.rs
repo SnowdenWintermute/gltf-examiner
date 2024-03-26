@@ -1,16 +1,13 @@
-use super::{spawn_scenes::SceneName, Animations};
+use super::Animations;
 use crate::bevy_app::utils::link_animations::AnimationEntityLink;
 use bevy::prelude::*;
 
 pub fn run_animations(
     mut animation_player_query: Query<&mut AnimationPlayer>,
-    scene_and_animation_player_link_query: Query<
-        (&SceneName, &AnimationEntityLink),
-        Added<AnimationEntityLink>,
-    >,
+    animation_player_link_query: Query<&AnimationEntityLink, Added<AnimationEntityLink>>,
     animations: Res<Animations>,
 ) {
-    for (_, animation_player_entity_link) in scene_and_animation_player_link_query.iter() {
+    for animation_player_entity_link in animation_player_link_query.iter() {
         let mut animation_player = animation_player_query
             .get_mut(animation_player_entity_link.0)
             .expect("to have an animation player on the main skeleton");

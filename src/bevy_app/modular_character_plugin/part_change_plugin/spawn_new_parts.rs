@@ -3,7 +3,8 @@ use crate::{
         asset_loader_plugin::MyAssets,
         modular_character_plugin::{
             spawn_character::{
-                CharacterId, CharacterPartScenesAwaitingSpawn, MainSkeletonBonesAndArmature,
+                CharacterIdComponent, CharacterPartScenesAwaitingSpawn,
+                MainSkeletonBonesAndArmature,
             },
             spawn_scenes::spawn_scene,
             CharactersById,
@@ -18,7 +19,7 @@ pub fn spawn_new_parts(
     mut commands: Commands,
     mut characters_with_spawned_skeletons: Query<(
         Entity,
-        &CharacterId,
+        &CharacterIdComponent,
         &mut CharacterPartScenesAwaitingSpawn,
         &MainSkeletonBonesAndArmature,
     )>,
@@ -43,6 +44,7 @@ pub fn spawn_new_parts(
             character_id, character_entity
         );
         // ensure it has an assigned skeleton
+
         if let Ok((_, _, mut parts_awaiting_spawn, _)) =
             characters_with_spawned_skeletons.get_mut(*character_entity)
         {

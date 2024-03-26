@@ -1,5 +1,6 @@
 use self::{
     assign_skeleton_bones_to_characters::assign_skeleton_bones_to_characters,
+    handle_animation_change_requests::handle_animation_change_requests,
     part_change_plugin::PartChangePlugin, register_animations::register_animations,
     run_animations::run_animations, spawn_character::spawn_character,
 };
@@ -8,6 +9,7 @@ use crate::bevy_app::asset_loader_plugin::AssetLoaderState;
 use bevy::{prelude::*, utils::HashMap};
 mod assemble_parts;
 mod assign_skeleton_bones_to_characters;
+mod handle_animation_change_requests;
 pub mod part_change_plugin;
 mod register_animations;
 mod run_animations;
@@ -50,6 +52,7 @@ impl Plugin for ModularCharacterPlugin {
                     assign_skeleton_bones_to_characters,
                     link_animations,
                     run_animations,
+                    handle_animation_change_requests,
                 )
                     .run_if(in_state(AssetLoaderState::Done)),
             );

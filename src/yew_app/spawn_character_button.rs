@@ -21,7 +21,7 @@ pub fn spawn_character_button() -> Html {
     });
 
     html!(
-    <button onclick={handle_click} class={format!("h-10 min-w-30 border border-slate-400 bg-slate-700")}>
+    <button onclick={handle_click} class={format!("h-10 min-w-30 border border-slate-400 bg-slate-700 pr-2 pl-2")}>
         {format!("Spawn next character with id : {}", app_state.next_character_id)}
     </button>
     )
