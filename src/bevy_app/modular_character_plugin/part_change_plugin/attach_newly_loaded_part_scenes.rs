@@ -1,12 +1,18 @@
-use crate::bevy_app::modular_character_plugin::{
-    assemble_parts::attach_part_to_main_skeleton::attach_part_to_main_skeleton,
-    part_change_plugin::despawn_attached_part::despawn_attached_part,
-    spawn_character::{
-        CharacterAttachedPartScenes, CharacterIdComponent, CharacterPartScenesAwaitingSpawn,
-        MainSkeletonBonesAndArmature, MainSkeletonEntity,
+use crate::{
+    bevy_app::modular_character_plugin::{
+        assemble_parts::{
+            attach_holdable::attach_holdable,
+            attach_part_to_main_skeleton::attach_part_to_main_skeleton,
+        },
+        part_change_plugin::despawn_attached_part::despawn_attached_part,
+        spawn_character::{
+            CharacterAttachedPartScenes, CharacterIdComponent, CharacterPartScenesAwaitingSpawn,
+            MainSkeletonBonesAndArmature, MainSkeletonEntity,
+        },
+        spawn_scenes::{SceneLoaded, SceneName},
+        AttachedPartsReparentedEntities,
     },
-    spawn_scenes::{SceneLoaded, SceneName},
-    AttachedPartsReparentedEntities,
+    frontend_common::CharacterPartCategories,
 };
 use bevy::{prelude::*, scene::SceneInstance};
 
@@ -61,18 +67,28 @@ pub fn attach_newly_loaded_part_scenes(
                     //    - add newly spawned part to character's list of attached parts
                     attached_parts.0.insert(category.clone(), entity);
                     //    - attach newly spawned part to character's skeleton bones
-                    attach_part_to_main_skeleton(
-                        &mut commands,
-                        &all_entities_with_children,
-                        &mut transforms,
-                        &names,
-                        &entity,
-                        &main_skeleton_bones_and_armature.1,
-                        &main_skeleton_bones_and_armature.0,
-                        &mut attached_parts_reparented_entities,
-                        &mut visibility_query,
-                    );
                     //    - make character armature visible
+                    match category {
+                        CharacterPartCategories::Weapon => attach_holdable(
+                            &mut commands,
+                            &entity,
+                            &main_skeleton_bones_and_armature.0,
+                            &mut visibility_query,
+                        ),
+                        _ => {
+                            attach_part_to_main_skeleton(
+                                &mut commands,
+                                &all_entities_with_children,
+                                &mut transforms,
+                                &names,
+                                &entity,
+                                &main_skeleton_bones_and_armature.1,
+                                &main_skeleton_bones_and_armature.0,
+                                &mut attached_parts_reparented_entities,
+                                &mut visibility_query,
+                            );
+                        }
+                    }
                 }
             }
         }

@@ -62,7 +62,7 @@ pub struct Props {
 #[function_component(CharacterPartSelectionCategoryButtonGroup)]
 pub fn character_part_selection_category_button_group(props: &Props) -> Html {
     html!(
-    <div class="mb-2">
+    <div class="mb-2 w-fit">
         <h3 class="text-xl mb-1">{props.title.clone()}</h3>
         <ul class="flex pointer-events-auto">
         {props.parts.iter()
