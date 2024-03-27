@@ -1,5 +1,8 @@
 use self::{
     assign_skeleton_bones_to_characters::assign_skeleton_bones_to_characters,
+    attack_sequence::{
+        draw_direction_ray_gizmos::draw_directional_gizmos, handle_attack_sequence_start_requests,
+    },
     handle_animation_change_requests::handle_animation_change_requests,
     part_change_plugin::PartChangePlugin,
     register_animations::register_animations,
@@ -9,9 +12,13 @@ use self::{
 };
 use super::utils::link_animations::link_animations;
 use crate::bevy_app::asset_loader_plugin::AssetLoaderState;
-use bevy::{prelude::*, utils::HashMap};
+use bevy::{
+    prelude::*,
+    utils::{HashMap, HashSet},
+};
 mod assemble_parts;
 mod assign_skeleton_bones_to_characters;
+mod attack_sequence;
 mod handle_animation_change_requests;
 pub mod part_change_plugin;
 mod register_animations;
@@ -35,11 +42,10 @@ pub struct AttachedPartsReparentedEntities {
 }
 #[derive(Resource, Default)]
 pub struct NextCharacterXLocation(f32);
-
 #[derive(Resource, Default)]
-pub struct CombatantHomeLocations(HashMap<CharacterId, HomeLocation>);
+pub struct CombatantsExecutingAttacks(HashSet<CharacterId>);
 
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, Component)]
 pub struct HomeLocation {
     position: Vec3,
     rotation: f32,
@@ -53,7 +59,7 @@ impl Plugin for ModularCharacterPlugin {
             .init_resource::<SkeletonsAwaitingCharacterAssignment>()
             .init_resource::<Animations>()
             .init_resource::<NextCharacterXLocation>()
-            .init_resource::<CombatantHomeLocations>()
+            .init_resource::<CombatantsExecutingAttacks>()
             .add_plugins(PartChangePlugin)
             .add_systems(
                 OnEnter(AssetLoaderState::RegisteringAnimations),
@@ -67,6 +73,8 @@ impl Plugin for ModularCharacterPlugin {
                     link_animations,
                     run_animations,
                     handle_animation_change_requests,
+                    draw_directional_gizmos,
+                    handle_attack_sequence_start_requests,
                 )
                     .run_if(in_state(AssetLoaderState::Done)),
             )

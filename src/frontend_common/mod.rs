@@ -29,3 +29,9 @@ pub struct CharacterAnimationSelection {
     pub character_id: CharacterId,
     pub name: String,
 }
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct AttackCommand {
+    pub combatant_id: CharacterId,
+    pub target_id: CharacterId,
+}

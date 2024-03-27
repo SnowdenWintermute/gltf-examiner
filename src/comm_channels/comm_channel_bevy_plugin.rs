@@ -4,6 +4,7 @@ use super::CharacterPartSelectionEvent;
 use super::CharacterSpawnEvent;
 use super::MessageFromYew;
 use super::SelectAnimationEvent;
+use super::StartAttackSequenceEvent;
 use super::YewTransmitter;
 use bevy::prelude::*;
 
@@ -28,6 +29,7 @@ impl Plugin for CommChannelPlugin {
             .init_resource::<Events<CharacterPartSelectionEvent>>()
             .init_resource::<Events<CharacterSpawnEvent>>()
             .init_resource::<Events<SelectAnimationEvent>>()
+            .init_resource::<Events<StartAttackSequenceEvent>>()
             .add_systems(PreUpdate, handle_yew_messages);
     }
 }
@@ -37,6 +39,7 @@ fn handle_yew_messages(
     mut part_selection_event_writer: EventWriter<CharacterPartSelectionEvent>,
     mut spawn_character_event_writer: EventWriter<CharacterSpawnEvent>,
     mut select_animation_event_writer: EventWriter<SelectAnimationEvent>,
+    mut attack_sequence_event_writer: EventWriter<StartAttackSequenceEvent>,
 ) {
     if let Ok(message_from_yew) = bevy_receiver.try_recv() {
         match message_from_yew {
@@ -48,6 +51,9 @@ fn handle_yew_messages(
             }
             MessageFromYew::SelectAnimation(animation_name) => {
                 select_animation_event_writer.send(SelectAnimationEvent(animation_name));
+            }
+            MessageFromYew::ExecuteAttackSequence(attack_command) => {
+                attack_sequence_event_writer.send(StartAttackSequenceEvent(attack_command));
             }
         }
     }

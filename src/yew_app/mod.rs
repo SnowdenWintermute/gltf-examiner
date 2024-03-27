@@ -1,6 +1,7 @@
 mod app;
 mod character_part_selection_menu;
 mod character_select_input;
+mod execute_attack_sequence_button;
 mod select_animation_button;
 mod select_character_part_button;
 mod spawn_character_button;

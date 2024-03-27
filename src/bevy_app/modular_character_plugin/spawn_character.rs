@@ -1,5 +1,5 @@
 use super::{spawn_scenes::spawn_scene, CharactersById, SkeletonsAwaitingCharacterAssignment};
-use super::{CharacterId, CombatantHomeLocations, HomeLocation};
+use super::{CharacterId, HomeLocation};
 use crate::frontend_common::CharacterPartCategories;
 use crate::{bevy_app::asset_loader_plugin::MyAssets, comm_channels::CharacterSpawnEvent};
 use bevy::{gltf::Gltf, prelude::*, utils::HashMap, utils::HashSet};
@@ -18,6 +18,12 @@ pub struct MainSkeletonBonesAndArmature(pub HashMap<String, Entity>, pub Entity)
 pub struct CharacterPartScenesAwaitingSpawn(pub HashMap<CharacterPartCategories, HashSet<Entity>>);
 #[derive(Component, Default)]
 pub struct CharacterAttachedPartScenes(pub HashMap<CharacterPartCategories, Entity>);
+// animations
+#[derive(Component, Default)]
+pub struct AnimationManagerComponent {
+    pub current_animation_name: String,
+    pub destination: Option<Transform>,
+}
 
 pub fn spawn_characters(
     mut commands: Commands,
@@ -26,7 +32,6 @@ pub fn spawn_characters(
     assets_gltf: Res<Assets<Gltf>>,
     mut characters_by_id: ResMut<CharactersById>,
     mut skeletons_awaiting_character_assignment: ResMut<SkeletonsAwaitingCharacterAssignment>,
-    mut combatant_home_locations: ResMut<CombatantHomeLocations>,
 ) {
     for event in character_spawn_event_reader.read() {
         let character_id = event.0;
@@ -36,7 +41,6 @@ pub fn spawn_characters(
             &assets_gltf,
             &mut characters_by_id,
             &mut skeletons_awaiting_character_assignment,
-            &mut combatant_home_locations,
             HomeLocation {
                 position: Vec3::ZERO,
                 rotation: 0.0,
@@ -52,7 +56,6 @@ pub fn spawn_character(
     assets_gltf: &Res<Assets<Gltf>>,
     characters_by_id: &mut ResMut<CharactersById>,
     skeletons_awaiting_character_assignment: &mut ResMut<SkeletonsAwaitingCharacterAssignment>,
-    combatant_home_locations: &mut ResMut<CombatantHomeLocations>,
     home_location: HomeLocation,
     character_id: CharacterId,
 ) {
@@ -82,6 +85,8 @@ pub fn spawn_character(
         MainSkeletonEntity(skeleton_entity),
         CharacterAttachedPartScenes(HashMap::new()),
         CharacterPartScenesAwaitingSpawn(HashMap::new()),
+        home_location,
+        AnimationManagerComponent::default(),
     ));
 
     let character_entity = character_entity_commands.id();

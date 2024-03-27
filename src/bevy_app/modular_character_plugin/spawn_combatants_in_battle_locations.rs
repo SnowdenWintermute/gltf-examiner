@@ -1,11 +1,10 @@
-use std::f32::consts::PI;
-
 use super::{
-    spawn_character::spawn_character, CharactersById, CombatantHomeLocations, HomeLocation,
+    spawn_character::spawn_character, CharactersById, HomeLocation,
     SkeletonsAwaitingCharacterAssignment,
 };
 use crate::bevy_app::asset_loader_plugin::MyAssets;
 use bevy::{gltf::Gltf, prelude::*};
+use std::f32::consts::PI;
 
 pub fn spawn_combatants_in_battle_locations(
     mut commands: Commands,
@@ -13,7 +12,6 @@ pub fn spawn_combatants_in_battle_locations(
     assets_gltf: Res<Assets<Gltf>>,
     mut characters_by_id: ResMut<CharactersById>,
     mut skeletons_awaiting_character_assignment: ResMut<SkeletonsAwaitingCharacterAssignment>,
-    mut combatant_home_locations: ResMut<CombatantHomeLocations>,
 ) {
     let mut home_location = HomeLocation {
         position: Vec3 {
@@ -21,7 +19,7 @@ pub fn spawn_combatants_in_battle_locations(
             y: 0.0,
             z: -1.5,
         },
-        rotation: 0.0,
+        rotation: PI,
     };
 
     for i in 0..=2 as u32 {
@@ -31,7 +29,6 @@ pub fn spawn_combatants_in_battle_locations(
             &assets_gltf,
             &mut characters_by_id,
             &mut skeletons_awaiting_character_assignment,
-            &mut combatant_home_locations,
             home_location.clone(),
             i,
         );
@@ -44,7 +41,7 @@ pub fn spawn_combatants_in_battle_locations(
             y: 0.0,
             z: 1.5,
         },
-        rotation: PI,
+        rotation: 0.0,
     };
 
     for i in 3..=5 as u32 {
@@ -54,7 +51,6 @@ pub fn spawn_combatants_in_battle_locations(
             &assets_gltf,
             &mut characters_by_id,
             &mut skeletons_awaiting_character_assignment,
-            &mut combatant_home_locations,
             home_location.clone(),
             i,
         );

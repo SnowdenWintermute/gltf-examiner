@@ -1,5 +1,6 @@
 pub mod comm_channel_bevy_plugin;
 use crate::bevy_app::modular_character_plugin::CharacterId;
+use crate::frontend_common::AttackCommand;
 use crate::frontend_common::CharacterAnimationSelection;
 use crate::frontend_common::CharacterPartSelection;
 use crate::frontend_common::PartsByName;
@@ -15,6 +16,7 @@ pub enum MessageFromYew {
     SelectCharacterPart(CharacterPartSelection),
     SpawnCharacter(CharacterId),
     SelectAnimation(CharacterAnimationSelection),
+    ExecuteAttackSequence(AttackCommand),
 }
 #[derive(Clone, Debug, Event)]
 pub struct CharacterPartSelectionEvent(pub CharacterPartSelection);
@@ -24,6 +26,9 @@ pub struct CharacterSpawnEvent(pub CharacterId);
 
 #[derive(Clone, Debug, Event)]
 pub struct SelectAnimationEvent(pub CharacterAnimationSelection);
+
+#[derive(Clone, Debug, Event)]
+pub struct StartAttackSequenceEvent(pub AttackCommand);
 
 // BEVY MESSAGES
 #[derive(Debug, Clone, PartialEq)]
