@@ -18,7 +18,7 @@ pub fn run_animations(
             .play(
                 animations
                     .0
-                    .get("Sword_Slash")
+                    .get("Idle")
                     .expect("to have an animation by this name")
                     .clone_weak(),
             )

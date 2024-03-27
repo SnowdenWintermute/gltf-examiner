@@ -1,3 +1,4 @@
+use super::HomeLocation;
 use bevy::{gltf::Gltf, prelude::*};
 
 #[derive(Component, Debug)]
@@ -12,7 +13,7 @@ pub fn spawn_scene(
     gltf_handle: Handle<Gltf>,
     name: String,
     spawn_hidden: bool,
-    x: f32,
+    start_position: HomeLocation,
 ) -> Option<Entity> {
     if let Some(gltf) = assets_gltf.get(gltf_handle) {
         let visibility = if spawn_hidden {
@@ -20,7 +21,13 @@ pub fn spawn_scene(
         } else {
             Visibility::Visible
         };
-        let transform = Transform::from_xyz(x + 0.0, 0.0, 0.0);
+        let mut transform = Transform::from_xyz(
+            start_position.position.x,
+            start_position.position.y,
+            start_position.position.z,
+        );
+        transform.rotate_y(start_position.rotation);
+
         let entity_commands = commands.spawn((
             SceneBundle {
                 scene: gltf.named_scenes["Scene"].clone(),

@@ -1,8 +1,11 @@
 use self::{
     assign_skeleton_bones_to_characters::assign_skeleton_bones_to_characters,
     handle_animation_change_requests::handle_animation_change_requests,
-    part_change_plugin::PartChangePlugin, register_animations::register_animations,
-    run_animations::run_animations, spawn_character::spawn_character,
+    part_change_plugin::PartChangePlugin,
+    register_animations::register_animations,
+    run_animations::run_animations,
+    spawn_character::{spawn_character, spawn_characters},
+    spawn_combatants_in_battle_locations::spawn_combatants_in_battle_locations,
 };
 use super::utils::link_animations::link_animations;
 use crate::bevy_app::asset_loader_plugin::AssetLoaderState;
@@ -14,6 +17,7 @@ pub mod part_change_plugin;
 mod register_animations;
 mod run_animations;
 mod spawn_character;
+mod spawn_combatants_in_battle_locations;
 pub mod spawn_scenes;
 
 pub type CharacterId = u32;
@@ -32,6 +36,15 @@ pub struct AttachedPartsReparentedEntities {
 #[derive(Resource, Default)]
 pub struct NextCharacterXLocation(f32);
 
+#[derive(Resource, Default)]
+pub struct CombatantHomeLocations(HashMap<CharacterId, HomeLocation>);
+
+#[derive(Default, Debug, Clone)]
+pub struct HomeLocation {
+    position: Vec3,
+    rotation: f32,
+}
+
 pub struct ModularCharacterPlugin;
 impl Plugin for ModularCharacterPlugin {
     fn build(&self, app: &mut App) {
@@ -40,6 +53,7 @@ impl Plugin for ModularCharacterPlugin {
             .init_resource::<SkeletonsAwaitingCharacterAssignment>()
             .init_resource::<Animations>()
             .init_resource::<NextCharacterXLocation>()
+            .init_resource::<CombatantHomeLocations>()
             .add_plugins(PartChangePlugin)
             .add_systems(
                 OnEnter(AssetLoaderState::RegisteringAnimations),
@@ -48,13 +62,17 @@ impl Plugin for ModularCharacterPlugin {
             .add_systems(
                 Update,
                 (
-                    spawn_character,
+                    spawn_characters,
                     assign_skeleton_bones_to_characters,
                     link_animations,
                     run_animations,
                     handle_animation_change_requests,
                 )
                     .run_if(in_state(AssetLoaderState::Done)),
+            )
+            .add_systems(
+                OnEnter(AssetLoaderState::Done),
+                spawn_combatants_in_battle_locations,
             );
     }
 }

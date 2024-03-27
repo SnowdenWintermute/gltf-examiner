@@ -7,7 +7,7 @@ use crate::{
                 MainSkeletonBonesAndArmature,
             },
             spawn_scenes::spawn_scene,
-            CharactersById,
+            CharactersById, HomeLocation,
         },
     },
     comm_channels::CharacterPartSelectionEvent,
@@ -82,7 +82,7 @@ pub fn spawn_part(
         gltf_handle.clone(),
         file_name.clone(),
         true,
-        0.0,
+        HomeLocation::default(),
     )
     .expect("to spawn the scene");
     info!("spawned part scene: {:?}", part_scene_entity);
