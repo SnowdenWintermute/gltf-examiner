@@ -26,6 +26,7 @@ pub struct HitboxRadius(pub f32);
 pub struct AnimationManagerComponent {
     pub current_animation_name: String,
     pub destination: Option<Transform>,
+    pub last_location: Option<Transform>,
     pub time_started: Option<u64>,
 }
 

@@ -73,6 +73,14 @@ pub fn assign_skeleton_bones_to_characters(
                         &assets_gltf,
                         &mut parts_awaiting_spawn,
                     );
+                    spawn_part(
+                        &"sword.glb".to_string(),
+                        &CharacterPartCategories::Weapon,
+                        &mut commands,
+                        &asset_pack,
+                        &assets_gltf,
+                        &mut parts_awaiting_spawn,
+                    );
                 }
             }
         }
