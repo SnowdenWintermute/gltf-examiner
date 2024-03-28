@@ -2,6 +2,7 @@ use self::{
     assign_skeleton_bones_to_characters::assign_skeleton_bones_to_characters,
     attack_sequence::{
         draw_direction_ray_gizmos::draw_directional_gizmos, handle_attack_sequence_start_requests,
+        move_entities_toward_destinations::move_entities_toward_destinations,
     },
     handle_animation_change_requests::handle_animation_change_requests,
     part_change_plugin::PartChangePlugin,
@@ -46,10 +47,7 @@ pub struct NextCharacterXLocation(f32);
 pub struct CombatantsExecutingAttacks(HashSet<CharacterId>);
 
 #[derive(Default, Debug, Clone, Component)]
-pub struct HomeLocation {
-    position: Vec3,
-    rotation: f32,
-}
+pub struct HomeLocation(Transform);
 
 pub struct ModularCharacterPlugin;
 impl Plugin for ModularCharacterPlugin {
@@ -75,6 +73,7 @@ impl Plugin for ModularCharacterPlugin {
                     handle_animation_change_requests,
                     draw_directional_gizmos,
                     handle_attack_sequence_start_requests,
+                    move_entities_toward_destinations,
                 )
                     .run_if(in_state(AssetLoaderState::Done)),
             )

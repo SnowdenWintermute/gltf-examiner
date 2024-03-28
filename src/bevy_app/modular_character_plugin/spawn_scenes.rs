@@ -21,17 +21,11 @@ pub fn spawn_scene(
         } else {
             Visibility::Visible
         };
-        let mut transform = Transform::from_xyz(
-            start_position.position.x,
-            start_position.position.y,
-            start_position.position.z,
-        );
-        transform.rotate_y(start_position.rotation);
 
         let entity_commands = commands.spawn((
             SceneBundle {
                 scene: gltf.named_scenes["Scene"].clone(),
-                transform,
+                transform: start_position.0,
                 visibility,
                 ..Default::default()
             },

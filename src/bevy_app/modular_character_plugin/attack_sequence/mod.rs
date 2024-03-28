@@ -1,16 +1,18 @@
 pub mod draw_direction_ray_gizmos;
-mod move_entities_toward_destinations;
-use std::time::Duration;
-
+pub mod move_entities_toward_destinations;
 use super::{
-    spawn_character::{AnimationManagerComponent, CharacterIdComponent, MainSkeletonEntity},
+    spawn_character::{
+        AnimationManagerComponent, CharacterIdComponent, HitboxRadius, MainSkeletonEntity,
+    },
     Animations, CharactersById, CombatantsExecutingAttacks,
 };
 use crate::{
     bevy_app::utils::link_animations::AnimationEntityLink, comm_channels::StartAttackSequenceEvent,
     frontend_common::AttackCommand,
 };
-use bevy::{prelude::*, reflect::List};
+use bevy::prelude::*;
+use js_sys::Date;
+use std::time::Duration;
 
 // get home location of target
 // set destination on combatant
@@ -28,6 +30,7 @@ pub fn handle_attack_sequence_start_requests(
         &CharacterIdComponent,
         &MainSkeletonEntity,
         &mut AnimationManagerComponent,
+        &HitboxRadius,
     )>,
     animation_player_links: Query<&AnimationEntityLink>,
     mut animation_players: Query<&mut AnimationPlayer>,
@@ -47,9 +50,10 @@ pub fn handle_attack_sequence_start_requests(
             .0
             .get(&target_id)
             .expect("to have the entity");
-        let (_, target_skeleton_entity, _) = combatants
+        let (_, target_skeleton_entity, _, target_hitbox_radius) = combatants
             .get(*target_entity)
             .expect("to have the combatant");
+        let cloned_target_hitbox_radius = target_hitbox_radius.clone();
         let target_transform = transforms
             .get(target_skeleton_entity.0)
             .expect("to have the transform")
@@ -58,11 +62,26 @@ pub fn handle_attack_sequence_start_requests(
             .0
             .get(&combatant_id)
             .expect("to have the entity");
-        let (_, combatant_skeleton_entity, mut combatant_animation_manager) = combatants
+
+        let (_, combatant_skeleton_entity, mut combatant_animation_manager, _) = combatants
             .get_mut(*combatant_entity)
             .expect("to have the combatant");
-        combatant_animation_manager.destination = Some(target_transform.clone());
+        let combatant_transform = transforms
+            .get(combatant_skeleton_entity.0)
+            .expect("to have the transform")
+            .clone();
+        // Calculate destination
+        let direction =
+            (combatant_transform.translation - target_transform.translation).normalize();
+        let destination = target_transform.translation + direction * cloned_target_hitbox_radius.0;
+        combatant_animation_manager.destination = Some(Transform::from_xyz(
+            destination[0],
+            destination[1],
+            destination[2],
+        ));
         combatant_animation_manager.current_animation_name = "Run".to_string();
+        combatant_animation_manager.time_started = Some(Date::new_0().get_time() as u64);
+
         combatants_executing_attacks.0.insert(combatant_id);
 
         let animation_player_link = animation_player_links

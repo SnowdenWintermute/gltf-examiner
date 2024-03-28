@@ -18,11 +18,15 @@ pub struct MainSkeletonBonesAndArmature(pub HashMap<String, Entity>, pub Entity)
 pub struct CharacterPartScenesAwaitingSpawn(pub HashMap<CharacterPartCategories, HashSet<Entity>>);
 #[derive(Component, Default)]
 pub struct CharacterAttachedPartScenes(pub HashMap<CharacterPartCategories, Entity>);
+#[derive(Component, Default, Clone)]
+pub struct HitboxRadius(pub f32);
+
 // animations
 #[derive(Component, Default)]
 pub struct AnimationManagerComponent {
     pub current_animation_name: String,
     pub destination: Option<Transform>,
+    pub time_started: Option<u64>,
 }
 
 pub fn spawn_characters(
@@ -41,10 +45,7 @@ pub fn spawn_characters(
             &assets_gltf,
             &mut characters_by_id,
             &mut skeletons_awaiting_character_assignment,
-            HomeLocation {
-                position: Vec3::ZERO,
-                rotation: 0.0,
-            },
+            HomeLocation(Transform::from_xyz(0.0, 0.0, 0.0)),
             character_id,
         )
     }
@@ -87,6 +88,7 @@ pub fn spawn_character(
         CharacterPartScenesAwaitingSpawn(HashMap::new()),
         home_location,
         AnimationManagerComponent::default(),
+        HitboxRadius(0.7),
     ));
 
     let character_entity = character_entity_commands.id();

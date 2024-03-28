@@ -13,14 +13,8 @@ pub fn spawn_combatants_in_battle_locations(
     mut characters_by_id: ResMut<CharactersById>,
     mut skeletons_awaiting_character_assignment: ResMut<SkeletonsAwaitingCharacterAssignment>,
 ) {
-    let mut home_location = HomeLocation {
-        position: Vec3 {
-            x: 0.0,
-            y: 0.0,
-            z: -1.5,
-        },
-        rotation: PI,
-    };
+    let mut home_location = HomeLocation(Transform::from_xyz(0.0, 0.0, -1.5));
+    home_location.0.rotate_y(PI);
 
     for i in 0..=2 as u32 {
         spawn_character(
@@ -32,17 +26,10 @@ pub fn spawn_combatants_in_battle_locations(
             home_location.clone(),
             i,
         );
-        home_location.position.x += 1.0;
+        home_location.0.translation.x += 1.0;
     }
 
-    let mut home_location = HomeLocation {
-        position: Vec3 {
-            x: 0.0,
-            y: 0.0,
-            z: 1.5,
-        },
-        rotation: 0.0,
-    };
+    let mut home_location = HomeLocation(Transform::from_xyz(0.0, 0.0, 1.5));
 
     for i in 3..=5 as u32 {
         spawn_character(
@@ -54,6 +41,6 @@ pub fn spawn_combatants_in_battle_locations(
             home_location.clone(),
             i,
         );
-        home_location.position.x += 1.0;
+        home_location.0.translation.x += 1.0;
     }
 }

@@ -12,7 +12,9 @@ pub fn register_animations(
     mut animations: ResMut<Animations>,
     mut next_state: ResMut<NextState<AssetLoaderState>>,
     transmitter: ResMut<BevyTransmitter>,
+    // mut config_store: ResMut<GizmoConfigStore>,
 ) {
+    // config_store.config_mut::<AabbGizmoConfigGroup>().1.draw_all ^= true;
     let handle = asset_pack
         .main_skeletons_with_animations
         .get("main_skeleton.glb")
