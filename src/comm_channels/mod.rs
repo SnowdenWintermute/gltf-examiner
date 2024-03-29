@@ -1,30 +1,56 @@
 pub mod comm_channel_bevy_plugin;
+use crate::bevy_app::modular_character_plugin::CharacterId;
+use crate::bevy_app::modular_character_plugin::HomeLocation;
+use crate::frontend_common::AttackCommand;
+use crate::frontend_common::CharacterAnimationSelection;
+use crate::frontend_common::CharacterPartSelection;
+use crate::frontend_common::PartsByName;
 use bevy::prelude::*;
-use tokio::sync::broadcast;
-// use crossbeam_channel::Receiver;
-// use crossbeam_channel::Sender;
 use broadcast::Receiver;
 use broadcast::Sender;
+use std::collections::HashSet;
+use tokio::sync::broadcast;
 
 // YEW MESSAGES
 #[derive(Debug, Clone)]
 pub enum MessageFromYew {
-    Counter(CounterEvent),
+    SelectCharacterPart(CharacterPartSelection),
+    SpawnCharacterWithHomeLocation(CharacterId, HomeLocation),
+    SelectAnimation(CharacterAnimationSelection),
+    ExecuteAttackSequence(AttackCommand),
 }
 #[derive(Clone, Debug, Event)]
-pub struct CounterEvent {
-    pub value: i32,
-}
+pub struct CharacterPartSelectionEvent(pub CharacterPartSelection);
+
+#[derive(Clone, Debug, Event)]
+pub struct CharacterSpawnEvent(pub CharacterId, pub HomeLocation);
+
+#[derive(Clone, Debug, Event)]
+pub struct SelectAnimationEvent(pub CharacterAnimationSelection);
+
+#[derive(Clone, Debug, Event)]
+pub struct StartAttackSequenceEvent(pub AttackCommand);
+
 // BEVY MESSAGES
 #[derive(Debug, Clone, PartialEq)]
 pub enum MessageFromBevy {
-    Text(String),
+    PartNames(PartsByName),
+    AnimationsAvailable(HashSet<String>),
+    CombatantSpawned(CharacterId),
+    AssetsLoaded,
 }
 // CHANNELS
 #[derive(Clone, Resource, Deref)]
 pub struct YewTransmitter(pub Sender<MessageFromYew>);
 #[derive(Resource, Deref, DerefMut)]
 pub struct YewReceiver(pub Receiver<MessageFromBevy>);
+
+// required so it can be passed as yew Props
+impl PartialEq for YewTransmitter {
+    fn eq(&self, _other: &Self) -> bool {
+        true
+    }
+}
 
 #[derive(Resource, Deref, DerefMut, Clone)]
 pub struct BevyTransmitter(pub Sender<MessageFromBevy>);
@@ -45,5 +71,4 @@ pub fn create_comm_channels() -> (
             BevyReceiver(bevy_receiver),
         ),
     )
-    //
 }

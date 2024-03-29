@@ -1,20 +1,99 @@
 <html><head>
-<link rel="preload" href="/gltf-examiner-d97e6e56f74f69dc_bg.wasm" crossorigin="anonymous" integrity="sha384-IZ6_rW-kyCNNSMSh46dc2Iaw352xmqXaadF4wpXC0UZLeY3bkGTB-3zCrNj-WlLe" as="fetch" type="application/wasm">
-<link rel="modulepreload" href="/gltf-examiner-d97e6e56f74f69dc.js" crossorigin="anonymous" integrity="sha384-0cYsmm36VjnxQ2U2VuvqT5xSgm2zfepohRTvbVWCWpqiWSiGe77zGP9HCpIb0xMO"></head><body class="h-screen w-screen">
-    <div id="yew" class="absolute z-10"></div>
+<link rel="preload" href="/gltf-examiner-32753042faf5476c_bg.wasm" crossorigin="anonymous" integrity="sha384-IY4EANgrqmeYUmMNEN8MZ9g5rCV9q8F1LvqS2kcQ06HVISsKbtt1WEj43J4UCQ0I" as="fetch" type="application/wasm">
+<link rel="modulepreload" href="/591e629c2910290f-initializer.mjs" crossorigin="anonymous" integrity="sha384-cgW5y_gHeTqdU-pz8eHUUykqKW6xP_tik-QQZK3pKRp2rkOD2SWrG93iOGEfklLy">
+<link rel="modulepreload" href="/gltf-examiner-32753042faf5476c.js" crossorigin="anonymous" integrity="sha384-KiAfbXMTDwilgSOuoqk32t3RsdBnHvnTpryIalow-MB-A5wKLl-yYnX-VIWVswRp"></head><body class="h-screen w-screen bg-slate-700">
+    <div id="yew" class="absolute z-10 pointer-events-none"></div>
     
     
-    <link rel="stylesheet" href="/output-db2837ac509d035e.css" integrity="sha384-T_kdm5JnsNeBnyzxVPL6FpW6ic5_8xClHEWk1b3oVozwyquPtkQjabKSdjm15nze">
+    <link rel="stylesheet" href="/output-7df542861febf7a5.css" integrity="sha384-ZJXqn5RBxDNYO9yJFbX6LfdkQbamSUh4uDQr4uaSi2Y8dM4CbCUFTnva4FlSvFee">
     <canvas id="bevy" class="!w-screen !h-screen"></canvas>
-  
-
-
+    <!-- loading indicator -->
+    <div id="loading-indicator" class="absolute z-20 top-1/2 left-1/2 text-lg text-zinc-300 bg-slate-700 border border-slate-400 p-2 transition-opacity duration-1000 -translate-x-1/2 -translate-y-1/2"></div>
+    <div id="tailwind-class-creator" class="opacity-0">
+    
 <script type="module">
-import init, * as bindings from '/gltf-examiner-d97e6e56f74f69dc.js';
-init('/gltf-examiner-d97e6e56f74f69dc_bg.wasm');
+async function __trunkInitializer(source, initializer) {
+  if (initializer === undefined) {
+    return await init(source);
+  }
+
+  return await __trunkInitWithProgress(source, initializer);
+}
+
+async function __trunkInitWithProgress(source, initializer) {
+
+  const {
+    onStart, onProgress, onComplete, onSuccess, onFailure
+  } = initializer;
+
+  onStart?.();
+
+  const response = fetch(source)
+      .then((response) => {
+        const reader = response.body.getReader();
+        const headers = response.headers;
+        const status = response.status;
+        const statusText = response.statusText;
+
+        const total = +response.headers.get("Content-Length");
+        let current = 0;
+
+        const stream = new ReadableStream({
+          start(controller) {
+            function push() {
+              reader.read().then(({done, value}) => {
+                if (done) {
+                  onProgress?.({current: total, total});
+                  controller.close();
+                  return;
+                }
+
+                current += value.byteLength;
+                onProgress?.({current, total});
+                controller.enqueue(value);
+                push();
+              });
+            }
+
+            push();
+          },
+        });
+
+        return {
+          stream, init: {
+            headers, status, statusText
+          }
+        };
+      })
+      .then(({stream, init}) =>
+          new Response(stream, init),
+      );
+
+  return init(response)
+      .then((value) => {
+        onComplete?.();
+        onSuccess?.(value);
+        return value;
+      }, (reason) => {
+        onComplete?.();
+        onFailure?.(reason);
+        return reason;
+      });
+}
+
+
+import init, * as bindings from '/gltf-examiner-32753042faf5476c.js';
+import initializer from '/591e629c2910290f-initializer.mjs';
+
+await __trunkInitializer('/gltf-examiner-32753042faf5476c_bg.wasm', initializer());
+
+
 window.wasmBindings = bindings;
 
-</script><script>"use strict";
+</script>
+  
+
+</div><script>"use strict";
 
 (function () {
 

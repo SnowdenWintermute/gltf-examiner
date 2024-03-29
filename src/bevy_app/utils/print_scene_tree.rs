@@ -1,5 +1,7 @@
-use super::spawn_scenes::SceneName;
+#![allow(unused)]
 use bevy::prelude::*;
+
+use crate::bevy_app::modular_character_plugin::spawn_scenes::SceneName;
 
 pub fn walk_tree(
     all_entities_with_children: &Query<&Children>,

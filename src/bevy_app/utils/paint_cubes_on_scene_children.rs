@@ -1,10 +1,11 @@
-use crate::bevy_app::asset_loader_plugin::MyAssets;
-
-use super::spawn_scenes::SceneName;
+#![allow(unused)]
+use crate::bevy_app::{
+    asset_loader_plugin::MyAssets, modular_character_plugin::spawn_scenes::SceneName,
+};
 use bevy::prelude::*;
 use bevy_mod_billboard::BillboardTextBundle;
 
-pub fn paint_cubes_on_joints(
+pub fn paint_cubes_on_scene_children(
     mut commands: Commands,
     scene_query: Query<Entity, With<SceneName>>,
     all_entities_with_children: Query<&Children>,

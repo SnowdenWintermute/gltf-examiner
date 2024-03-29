@@ -1,7 +1,15 @@
 mod app;
+mod battle_combatant_spawner;
+mod character_part_selection_menu;
+mod character_select_input;
+mod character_selection_menu;
+mod execute_attack_sequence_button;
+mod select_animation_button;
+mod select_character_part_button;
+mod spawn_character_button;
+mod store;
 use self::app::App;
 use crate::comm_channels::BevyTransmitter;
-use crate::comm_channels::YewReceiver;
 use crate::comm_channels::YewTransmitter;
 use crate::SharedState;
 use std::sync::Arc;
@@ -12,7 +20,6 @@ use yew::prelude::*;
 pub struct Props {
     pub shared: Arc<Mutex<SharedState>>,
     pub transmitter: YewTransmitter,
-    pub receiver: YewReceiver,
     pub bevy_transmitter: BevyTransmitter,
 }
 
@@ -24,7 +31,6 @@ impl PartialEq for Props {
 
 pub fn yew_main(
     yew_transmitter: YewTransmitter,
-    yew_receiver: YewReceiver,
     bevy_transmitter: BevyTransmitter,
     shared: Arc<Mutex<SharedState>>,
 ) {
@@ -32,7 +38,6 @@ pub fn yew_main(
     let root = document.query_selector("#yew").unwrap().unwrap();
     let props = Props {
         transmitter: yew_transmitter,
-        receiver: yew_receiver,
         bevy_transmitter,
         shared,
     };
