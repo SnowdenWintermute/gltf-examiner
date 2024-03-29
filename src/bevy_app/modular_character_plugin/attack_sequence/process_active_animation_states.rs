@@ -1,20 +1,17 @@
-use super::{
-    process_combatant_approaching_melee_target::process_combatant_approaching_melee_target,
-    process_combatant_returning_to_home_position::process_combatant_returning_to_home_position,
-    process_combatant_swinging_weapons::process_combatant_swinging_weapons,
-};
-use crate::bevy_app::{
-    modular_character_plugin::{
-        animation_manager_component::{ActionSequenceStates, AnimationManagerComponent},
-        spawn_character::MainSkeletonEntity,
-        Animations, CharactersById, CombatantsExecutingAttacks, HomeLocation,
-    },
-    utils::link_animations::AnimationEntityLink,
-};
+use super::process_combatant_approaching_melee_target::process_combatant_approaching_melee_target;
+use super::process_combatant_recentering::process_combatant_recentering;
+use super::process_combatant_returning_to_home_position::process_combatant_returning_to_home_position;
+use super::process_combatant_swinging_weapons::process_combatant_swinging_weapons;
+use crate::bevy_app::modular_character_plugin::animation_manager_component::ActionSequenceStates;
+use crate::bevy_app::modular_character_plugin::animation_manager_component::AnimationManagerComponent;
+use crate::bevy_app::modular_character_plugin::spawn_character::MainSkeletonEntity;
+use crate::bevy_app::modular_character_plugin::Animations;
+use crate::bevy_app::modular_character_plugin::CharactersById;
+use crate::bevy_app::modular_character_plugin::CombatantsExecutingAttacks;
+use crate::bevy_app::modular_character_plugin::HomeLocation;
+use crate::bevy_app::utils::link_animations::AnimationEntityLink;
 use bevy::prelude::*;
 use js_sys::Date;
-
-pub const PERCENT_DISTANCE_TO_START_WEAPON_SWING: f32 = 0.8;
 
 pub fn process_active_animation_states(
     combatants_by_id: Res<CharactersById>,
@@ -83,12 +80,12 @@ pub fn process_active_animation_states(
                     &animations,
                     current_time,
                 ),
-                ActionSequenceStates::Recentering => {
-                    // recentering
-                    // - start playing recentering animation if not already
-                    // - if threshold passed, start idle animation
-                    // - if recentering animation duration complete, deactivate recentering
-                }
+                ActionSequenceStates::Recentering => process_combatant_recentering(
+                    &mut skeleton_entity_transform,
+                    &mut animation_manager,
+                    &home_location.0,
+                    current_time - time_started_option.expect("to have marked the start time"),
+                ),
             }
         }
     }

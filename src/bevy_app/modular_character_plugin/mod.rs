@@ -5,11 +5,11 @@ use self::{
         process_active_animation_states::process_active_animation_states,
     },
     handle_animation_change_requests::handle_animation_change_requests,
+    notify_yew_that_assets_are_loaded::notify_yew_that_assets_are_loaded,
     part_change_plugin::PartChangePlugin,
     register_animations::register_animations,
     run_animations::run_animations,
     spawn_character::spawn_characters,
-    spawn_combatants_in_battle_locations::spawn_combatants_in_battle_locations,
 };
 use super::utils::link_animations::link_animations;
 use crate::bevy_app::asset_loader_plugin::AssetLoaderState;
@@ -22,6 +22,7 @@ mod assemble_parts;
 mod assign_skeleton_bones_to_characters;
 mod attack_sequence;
 mod handle_animation_change_requests;
+mod notify_yew_that_assets_are_loaded;
 pub mod part_change_plugin;
 mod register_animations;
 mod run_animations;
@@ -48,7 +49,7 @@ pub struct NextCharacterXLocation(f32);
 pub struct CombatantsExecutingAttacks(HashSet<CharacterId>);
 
 #[derive(Default, Debug, Clone, Component)]
-pub struct HomeLocation(Transform);
+pub struct HomeLocation(pub Transform);
 
 pub struct ModularCharacterPlugin;
 impl Plugin for ModularCharacterPlugin {
@@ -80,7 +81,7 @@ impl Plugin for ModularCharacterPlugin {
             )
             .add_systems(
                 OnEnter(AssetLoaderState::Done),
-                spawn_combatants_in_battle_locations,
+                notify_yew_that_assets_are_loaded,
             );
     }
 }

@@ -1,5 +1,6 @@
 pub mod comm_channel_bevy_plugin;
 use crate::bevy_app::modular_character_plugin::CharacterId;
+use crate::bevy_app::modular_character_plugin::HomeLocation;
 use crate::frontend_common::AttackCommand;
 use crate::frontend_common::CharacterAnimationSelection;
 use crate::frontend_common::CharacterPartSelection;
@@ -14,7 +15,7 @@ use tokio::sync::broadcast;
 #[derive(Debug, Clone)]
 pub enum MessageFromYew {
     SelectCharacterPart(CharacterPartSelection),
-    SpawnCharacter(CharacterId),
+    SpawnCharacterWithHomeLocation(CharacterId, HomeLocation),
     SelectAnimation(CharacterAnimationSelection),
     ExecuteAttackSequence(AttackCommand),
 }
@@ -22,7 +23,7 @@ pub enum MessageFromYew {
 pub struct CharacterPartSelectionEvent(pub CharacterPartSelection);
 
 #[derive(Clone, Debug, Event)]
-pub struct CharacterSpawnEvent(pub CharacterId);
+pub struct CharacterSpawnEvent(pub CharacterId, pub HomeLocation);
 
 #[derive(Clone, Debug, Event)]
 pub struct SelectAnimationEvent(pub CharacterAnimationSelection);
@@ -35,6 +36,8 @@ pub struct StartAttackSequenceEvent(pub AttackCommand);
 pub enum MessageFromBevy {
     PartNames(PartsByName),
     AnimationsAvailable(HashSet<String>),
+    CombatantSpawned(CharacterId),
+    AssetsLoaded,
 }
 // CHANNELS
 #[derive(Clone, Resource, Deref)]

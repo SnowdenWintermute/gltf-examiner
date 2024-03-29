@@ -1,11 +1,10 @@
-use crate::{
-    bevy_app::modular_character_plugin::{
-        animation_manager_component::{ActionSequenceStates, AnimationManagerComponent},
-        Animations,
-    },
-    frontend_common::animation_names::{RUN_BACK, SWORD_SLASH},
-};
-use bevy::{math::u64, prelude::*};
+use crate::bevy_app::modular_character_plugin::animation_manager_component::ActionSequenceStates;
+use crate::bevy_app::modular_character_plugin::animation_manager_component::AnimationManagerComponent;
+use crate::bevy_app::modular_character_plugin::Animations;
+use crate::frontend_common::animation_names::RUN_BACK;
+use crate::frontend_common::animation_names::SWORD_SLASH;
+use bevy::math::u64;
+use bevy::prelude::*;
 use std::time::Duration;
 
 pub const SWORD_SLASH_PERCENT_COMPLETE_TRANSITION_THRESHOLD: f32 = 0.65;

@@ -1,4 +1,5 @@
-use bevy::{math::u64, prelude::*};
+use bevy::math::u64;
+use bevy::prelude::*;
 use std::collections::HashMap;
 
 pub type Timestamp = u64;
@@ -15,7 +16,7 @@ pub enum ActionSequenceStates {
 pub struct AnimationManagerComponent {
     pub active_states: HashMap<ActionSequenceStates, Option<Timestamp>>,
     pub destination: Option<Transform>,
-    pub target_rotation: Option<Quat>,
     pub last_location: Option<Transform>,
-    pub time_started: Option<u64>,
+    pub target_rotation: Option<Quat>,
+    pub last_rotation: Option<Quat>,
 }

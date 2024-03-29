@@ -85,7 +85,7 @@ pub fn spawn_part(
         HomeLocation::default(),
     )
     .expect("to spawn the scene");
-    info!("spawned part scene: {:?}", part_scene_entity);
+    // info!("spawned part scene: {:?}", part_scene_entity);
 
     parts_awaiting_spawn
         .0

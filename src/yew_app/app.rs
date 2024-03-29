@@ -3,7 +3,7 @@ use crate::{
     comm_channels::MessageFromBevy,
     yew_app::character_part_selection_menu::CharacterPartSelectionMenu,
 };
-use gloo::console::log;
+use gloo::console::{info, log};
 use std::ops::Deref;
 use yew::{platform::spawn_local, prelude::*};
 use yewdux::use_store;
@@ -33,8 +33,12 @@ pub fn app(props: &Props) -> Html {
             let most_recent_message_from_bevy_state = most_recent_message_from_bevy_state.clone();
             spawn_local(async move {
                 while let Ok(message) = receiver.recv().await {
-                    log!(format!("got message from bevy: {:#?}", message));
-                    most_recent_message_from_bevy_state.set(Vec::from([message.clone()]));
+                    let mut messages = Vec::from([message]);
+                    while let Ok(subsequent_message) = receiver.try_recv() {
+                        messages.push(subsequent_message)
+                    }
+                    log!(format!("got messages from bevy: {:#?}", messages));
+                    most_recent_message_from_bevy_state.set(messages);
                 }
             });
         }
@@ -45,6 +49,8 @@ pub fn app(props: &Props) -> Html {
     let cloned_most_recent_message_from_bevy_state = most_recent_message_from_bevy_state.clone();
     use_effect_with(most_recent_message_from_bevy_state, move |_| {
         let mut message_to_enqueue = cloned_most_recent_message_from_bevy_state.deref().clone();
+
+        log!(format!("enqueuing message : {:#?}", message_to_enqueue));
         let mut current_messages = cloned_queued_bevy_messages_state.deref().clone();
         current_messages.append(&mut message_to_enqueue);
         cloned_queued_bevy_messages_state.set(current_messages);
@@ -59,11 +65,19 @@ pub fn app(props: &Props) -> Html {
         move |cloned_queued_bevy_messages_state| {
             let messages = cloned_queued_bevy_messages_state.deref();
             for message in messages {
+                log!(format!("processing message {:?}", message));
                 match message {
                     MessageFromBevy::PartNames(part_names) => cloned_dispatch
                         .reduce_mut(|store| store.parts_available = part_names.clone()),
                     MessageFromBevy::AnimationsAvailable(animation_names) => cloned_dispatch
                         .reduce_mut(|store| store.animation_names = animation_names.clone()),
+                    MessageFromBevy::CombatantSpawned(combatant_id) => {
+                        cloned_dispatch.reduce_mut(|store| store.character_ids.push(*combatant_id))
+                    }
+                    MessageFromBevy::AssetsLoaded => {
+                        info!("setting assets loaded");
+                        cloned_dispatch.reduce_mut(|store| store.bevy_assets_loaded = true)
+                    }
                 }
             }
             cloned_queued_bevy_messages_state.set(Vec::new());

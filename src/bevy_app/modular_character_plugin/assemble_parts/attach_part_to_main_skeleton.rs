@@ -41,11 +41,11 @@ pub fn attach_part_to_main_skeleton(
         part_armature_entity_commands.set_parent(*main_armature_entity);
         // set visibility
         if let Ok(mut visibility) = visibility_query.get_mut(part_armature) {
-            info!(
-                "changing visibility for {:?}, was {:?}",
-                names.get(*part_scene_entity),
-                visibility
-            );
+            // info!(
+            //     "changing visibility for {:?}, was {:?}",
+            //     names.get(*part_scene_entity),
+            //     visibility
+            // );
             *visibility = Visibility::Visible;
         }
     }

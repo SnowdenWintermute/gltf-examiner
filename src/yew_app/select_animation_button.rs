@@ -1,7 +1,6 @@
-use crate::{
-    comm_channels::MessageFromYew, frontend_common::CharacterAnimationSelection,
-    yew_app::store::AppStore,
-};
+use crate::comm_channels::MessageFromYew;
+use crate::frontend_common::CharacterAnimationSelection;
+use crate::yew_app::store::AppStore;
 use yew::prelude::*;
 use yewdux::use_store;
 

@@ -1,20 +1,99 @@
 <html><head>
-<link rel="preload" href="/gltf-examiner-2988f0f41bcf5b07_bg.wasm" crossorigin="anonymous" integrity="sha384-pB3yhg-sJ7vgg-3W6DwqM5c7aJTZtF8GUvQjBrwAWEeHS7MQdNCCxJ5GyVhmvQG0" as="fetch" type="application/wasm">
-<link rel="modulepreload" href="/gltf-examiner-2988f0f41bcf5b07.js" crossorigin="anonymous" integrity="sha384-f_mva-6sLLn-6F1UUKf8Tmq5jqFJBSKsvGFLl3ZaC_y7PXqnzgRG8PgrVyuFhYMF"></head><body class="h-screen w-screen">
+<link rel="preload" href="/gltf-examiner-32753042faf5476c_bg.wasm" crossorigin="anonymous" integrity="sha384-IY4EANgrqmeYUmMNEN8MZ9g5rCV9q8F1LvqS2kcQ06HVISsKbtt1WEj43J4UCQ0I" as="fetch" type="application/wasm">
+<link rel="modulepreload" href="/591e629c2910290f-initializer.mjs" crossorigin="anonymous" integrity="sha384-cgW5y_gHeTqdU-pz8eHUUykqKW6xP_tik-QQZK3pKRp2rkOD2SWrG93iOGEfklLy">
+<link rel="modulepreload" href="/gltf-examiner-32753042faf5476c.js" crossorigin="anonymous" integrity="sha384-KiAfbXMTDwilgSOuoqk32t3RsdBnHvnTpryIalow-MB-A5wKLl-yYnX-VIWVswRp"></head><body class="h-screen w-screen bg-slate-700">
     <div id="yew" class="absolute z-10 pointer-events-none"></div>
     
     
-    <link rel="stylesheet" href="/output-62548df41749fe79.css" integrity="sha384-o16r8MAEMEsVNnXGSY7eB4BO1548MgNZ2AhWlkaSHa_SQigbbxaY3ks2_pA0JyZq">
+    <link rel="stylesheet" href="/output-7df542861febf7a5.css" integrity="sha384-ZJXqn5RBxDNYO9yJFbX6LfdkQbamSUh4uDQr4uaSi2Y8dM4CbCUFTnva4FlSvFee">
     <canvas id="bevy" class="!w-screen !h-screen"></canvas>
-  
-
-
+    <!-- loading indicator -->
+    <div id="loading-indicator" class="absolute z-20 top-1/2 left-1/2 text-lg text-zinc-300 bg-slate-700 border border-slate-400 p-2 transition-opacity duration-1000 -translate-x-1/2 -translate-y-1/2"></div>
+    <div id="tailwind-class-creator" class="opacity-0">
+    
 <script type="module">
-import init, * as bindings from '/gltf-examiner-2988f0f41bcf5b07.js';
-init('/gltf-examiner-2988f0f41bcf5b07_bg.wasm');
+async function __trunkInitializer(source, initializer) {
+  if (initializer === undefined) {
+    return await init(source);
+  }
+
+  return await __trunkInitWithProgress(source, initializer);
+}
+
+async function __trunkInitWithProgress(source, initializer) {
+
+  const {
+    onStart, onProgress, onComplete, onSuccess, onFailure
+  } = initializer;
+
+  onStart?.();
+
+  const response = fetch(source)
+      .then((response) => {
+        const reader = response.body.getReader();
+        const headers = response.headers;
+        const status = response.status;
+        const statusText = response.statusText;
+
+        const total = +response.headers.get("Content-Length");
+        let current = 0;
+
+        const stream = new ReadableStream({
+          start(controller) {
+            function push() {
+              reader.read().then(({done, value}) => {
+                if (done) {
+                  onProgress?.({current: total, total});
+                  controller.close();
+                  return;
+                }
+
+                current += value.byteLength;
+                onProgress?.({current, total});
+                controller.enqueue(value);
+                push();
+              });
+            }
+
+            push();
+          },
+        });
+
+        return {
+          stream, init: {
+            headers, status, statusText
+          }
+        };
+      })
+      .then(({stream, init}) =>
+          new Response(stream, init),
+      );
+
+  return init(response)
+      .then((value) => {
+        onComplete?.();
+        onSuccess?.(value);
+        return value;
+      }, (reason) => {
+        onComplete?.();
+        onFailure?.(reason);
+        return reason;
+      });
+}
+
+
+import init, * as bindings from '/gltf-examiner-32753042faf5476c.js';
+import initializer from '/591e629c2910290f-initializer.mjs';
+
+await __trunkInitializer('/gltf-examiner-32753042faf5476c_bg.wasm', initializer());
+
+
 window.wasmBindings = bindings;
 
-</script><script>"use strict";
+</script>
+  
+
+</div><script>"use strict";
 
 (function () {
 

@@ -1,6 +1,6 @@
-use crate::{
-    comm_channels::MessageFromYew, frontend_common::AttackCommand, yew_app::store::AppStore,
-};
+use crate::comm_channels::MessageFromYew;
+use crate::frontend_common::AttackCommand;
+use crate::yew_app::store::AppStore;
 use yew::prelude::*;
 use yewdux::use_store;
 
@@ -11,16 +11,13 @@ pub fn execute_attack_sequence_button() -> Html {
     let cloned_app_state = app_state.clone();
     let handle_click = Callback::from(move |_| {
         if let Some(transmitter) = &cloned_app_state.transmitter_option {
-            dispatch.reduce_mut(|store| {
+            dispatch.reduce_mut(|_| {
                 transmitter
                     .send(MessageFromYew::ExecuteAttackSequence(AttackCommand {
-                        combatant_id: 0,
-                        target_id: 5,
+                        combatant_id: cloned_app_state.selected_character_id,
+                        target_id: cloned_app_state.selected_target_id,
                     }))
                     .expect("could not send event");
-                store.character_ids.push(store.next_character_id);
-                store.selected_character_id = cloned_app_state.next_character_id;
-                store.next_character_id += 1;
             });
         }
     });

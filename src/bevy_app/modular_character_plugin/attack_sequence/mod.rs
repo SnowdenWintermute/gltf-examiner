@@ -2,20 +2,23 @@ pub mod draw_direction_ray_gizmos;
 pub mod move_entities_toward_destinations;
 pub mod process_active_animation_states;
 mod process_combatant_approaching_melee_target;
+mod process_combatant_recentering;
 mod process_combatant_returning_to_home_position;
 mod process_combatant_swinging_weapons;
 mod rotate_transform_toward_target;
 mod translate_transform_toward_target;
-use super::{
-    animation_manager_component::{ActionSequenceStates, AnimationManagerComponent},
-    spawn_character::{CharacterIdComponent, HitboxRadius, MainSkeletonEntity},
-    Animations, CharactersById, CombatantsExecutingAttacks,
-};
-use crate::{
-    bevy_app::utils::link_animations::AnimationEntityLink,
-    comm_channels::StartAttackSequenceEvent,
-    frontend_common::{animation_names::RUN, AttackCommand},
-};
+use super::animation_manager_component::ActionSequenceStates;
+use super::animation_manager_component::AnimationManagerComponent;
+use super::spawn_character::CharacterIdComponent;
+use super::spawn_character::HitboxRadius;
+use super::spawn_character::MainSkeletonEntity;
+use super::Animations;
+use super::CharactersById;
+use super::CombatantsExecutingAttacks;
+use crate::bevy_app::utils::link_animations::AnimationEntityLink;
+use crate::comm_channels::StartAttackSequenceEvent;
+use crate::frontend_common::animation_names::RUN;
+use crate::frontend_common::AttackCommand;
 use bevy::prelude::*;
 use js_sys::Date;
 use std::time::Duration;
@@ -49,6 +52,7 @@ pub fn handle_attack_sequence_start_requests(
         let (_, target_skeleton_entity, _, target_hitbox_radius) = combatants
             .get(*target_entity)
             .expect("to have the combatant");
+
         let cloned_target_hitbox_radius = target_hitbox_radius.clone();
         let target_transform = transforms
             .get(target_skeleton_entity.0)
@@ -62,6 +66,11 @@ pub fn handle_attack_sequence_start_requests(
         let (_, combatant_skeleton_entity, mut combatant_animation_manager, _) = combatants
             .get_mut(*combatant_entity)
             .expect("to have the combatant");
+
+        if combatant_animation_manager.active_states.len() > 0 {
+            continue;
+        }
+
         let combatant_transform = transforms
             .get(combatant_skeleton_entity.0)
             .expect("to have the transform")

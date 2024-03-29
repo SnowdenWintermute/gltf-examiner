@@ -12,7 +12,7 @@ pub fn run_animations(
             .get_mut(animation_player_entity_link.0)
             .expect("to have an animation player on the main skeleton");
 
-        info!("RUNNING ANIMATIONS");
+        // info!("RUNNING ANIMATIONS");
 
         animation_player
             .play(

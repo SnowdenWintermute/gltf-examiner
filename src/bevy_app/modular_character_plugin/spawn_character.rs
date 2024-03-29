@@ -1,6 +1,7 @@
 use super::animation_manager_component::AnimationManagerComponent;
 use super::{spawn_scenes::spawn_scene, CharactersById, SkeletonsAwaitingCharacterAssignment};
 use super::{CharacterId, HomeLocation};
+use crate::comm_channels::{BevyTransmitter, MessageFromBevy};
 use crate::frontend_common::CharacterPartCategories;
 use crate::{bevy_app::asset_loader_plugin::MyAssets, comm_channels::CharacterSpawnEvent};
 use bevy::{gltf::Gltf, prelude::*, utils::HashMap, utils::HashSet};
@@ -29,17 +30,20 @@ pub fn spawn_characters(
     assets_gltf: Res<Assets<Gltf>>,
     mut characters_by_id: ResMut<CharactersById>,
     mut skeletons_awaiting_character_assignment: ResMut<SkeletonsAwaitingCharacterAssignment>,
+    transmitter: ResMut<BevyTransmitter>,
 ) {
     for event in character_spawn_event_reader.read() {
         let character_id = event.0;
+        let home_location = &event.1;
         spawn_character(
             &mut commands,
             &asset_pack,
             &assets_gltf,
             &mut characters_by_id,
             &mut skeletons_awaiting_character_assignment,
-            HomeLocation(Transform::from_xyz(0.0, 0.0, 0.0)),
+            home_location.clone(),
             character_id,
+            &transmitter,
         )
     }
 }
@@ -52,6 +56,7 @@ pub fn spawn_character(
     skeletons_awaiting_character_assignment: &mut ResMut<SkeletonsAwaitingCharacterAssignment>,
     home_location: HomeLocation,
     character_id: CharacterId,
+    transmitter: &ResMut<BevyTransmitter>,
 ) {
     // - spawn skeleton and store its entity id on the character
     let skeleton_handle = asset_pack
@@ -108,4 +113,7 @@ pub fn spawn_character(
     });
 
     billboard_entity_commands.set_parent(skeleton_entity);
+
+    // NOTIFY YEW
+    transmitter.send(MessageFromBevy::CombatantSpawned(character_id));
 }
