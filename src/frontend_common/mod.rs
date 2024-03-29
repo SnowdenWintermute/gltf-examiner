@@ -1,3 +1,4 @@
+pub mod animation_names;
 use crate::bevy_app::modular_character_plugin::CharacterId;
 use std::collections::HashSet;
 

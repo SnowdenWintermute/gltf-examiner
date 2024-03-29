@@ -1,3 +1,4 @@
+use super::animation_manager_component::AnimationManagerComponent;
 use super::{spawn_scenes::spawn_scene, CharactersById, SkeletonsAwaitingCharacterAssignment};
 use super::{CharacterId, HomeLocation};
 use crate::frontend_common::CharacterPartCategories;
@@ -20,15 +21,6 @@ pub struct CharacterPartScenesAwaitingSpawn(pub HashMap<CharacterPartCategories,
 pub struct CharacterAttachedPartScenes(pub HashMap<CharacterPartCategories, Entity>);
 #[derive(Component, Default, Clone)]
 pub struct HitboxRadius(pub f32);
-
-// animations
-#[derive(Component, Default)]
-pub struct AnimationManagerComponent {
-    pub current_animation_name: String,
-    pub destination: Option<Transform>,
-    pub last_location: Option<Transform>,
-    pub time_started: Option<u64>,
-}
 
 pub fn spawn_characters(
     mut commands: Commands,

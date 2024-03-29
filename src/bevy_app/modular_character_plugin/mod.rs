@@ -2,13 +2,13 @@ use self::{
     assign_skeleton_bones_to_characters::assign_skeleton_bones_to_characters,
     attack_sequence::{
         draw_direction_ray_gizmos::draw_directional_gizmos, handle_attack_sequence_start_requests,
-        move_entities_toward_destinations::move_entities_toward_destinations,
+        process_active_animation_states::process_active_animation_states,
     },
     handle_animation_change_requests::handle_animation_change_requests,
     part_change_plugin::PartChangePlugin,
     register_animations::register_animations,
     run_animations::run_animations,
-    spawn_character::{spawn_character, spawn_characters},
+    spawn_character::spawn_characters,
     spawn_combatants_in_battle_locations::spawn_combatants_in_battle_locations,
 };
 use super::utils::link_animations::link_animations;
@@ -17,6 +17,7 @@ use bevy::{
     prelude::*,
     utils::{HashMap, HashSet},
 };
+pub mod animation_manager_component;
 mod assemble_parts;
 mod assign_skeleton_bones_to_characters;
 mod attack_sequence;
@@ -73,7 +74,7 @@ impl Plugin for ModularCharacterPlugin {
                     handle_animation_change_requests,
                     draw_directional_gizmos,
                     handle_attack_sequence_start_requests,
-                    move_entities_toward_destinations,
+                    process_active_animation_states,
                 )
                     .run_if(in_state(AssetLoaderState::Done)),
             )

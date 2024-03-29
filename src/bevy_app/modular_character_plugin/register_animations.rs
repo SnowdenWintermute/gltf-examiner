@@ -25,8 +25,9 @@ pub fn register_animations(
 
     let mut animation_names_for_yew: HashSet<String> = HashSet::new();
 
+    info!("inserting animations");
     for named_animation in gltf.named_animations.iter() {
-        info!("inserting animation: {}", named_animation.0);
+        // info!("inserting animations: {}", named_animation.0);
         animations.0.insert(
             named_animation.0.clone(),
             gltf.named_animations[named_animation.0].clone(),

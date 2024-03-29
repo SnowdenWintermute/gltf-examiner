@@ -1,5 +1,6 @@
-use crate::bevy_app::modular_character_plugin::spawn_character::{
-    AnimationManagerComponent, HitboxRadius, MainSkeletonEntity,
+use crate::bevy_app::modular_character_plugin::{
+    animation_manager_component::AnimationManagerComponent,
+    spawn_character::{HitboxRadius, MainSkeletonEntity},
 };
 use bevy::prelude::*;
 

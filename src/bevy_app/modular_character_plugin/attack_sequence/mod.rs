@@ -1,29 +1,25 @@
 pub mod draw_direction_ray_gizmos;
 pub mod move_entities_toward_destinations;
+pub mod process_active_animation_states;
+mod process_combatant_approaching_melee_target;
+mod process_combatant_returning_to_home_position;
+mod process_combatant_swinging_weapons;
+mod rotate_transform_toward_target;
+mod translate_transform_toward_target;
 use super::{
-    spawn_character::{
-        AnimationManagerComponent, CharacterIdComponent, HitboxRadius, MainSkeletonEntity,
-    },
+    animation_manager_component::{ActionSequenceStates, AnimationManagerComponent},
+    spawn_character::{CharacterIdComponent, HitboxRadius, MainSkeletonEntity},
     Animations, CharactersById, CombatantsExecutingAttacks,
 };
 use crate::{
-    bevy_app::utils::link_animations::AnimationEntityLink, comm_channels::StartAttackSequenceEvent,
-    frontend_common::AttackCommand,
+    bevy_app::utils::link_animations::AnimationEntityLink,
+    comm_channels::StartAttackSequenceEvent,
+    frontend_common::{animation_names::RUN, AttackCommand},
 };
 use bevy::prelude::*;
 use js_sys::Date;
 use std::time::Duration;
 
-// get home location of target
-// set destination on combatant
-// set direction vector
-// set running animation on combatant
-// on update
-// - move translation toward direction vector
-// - check if within threshold distance of destination
-// - if so, start sword_slash animation and set current_animation component to sword_slash
-// - if current animation is sword_slash check if .is_finished()
-// - if so, set destination to home_location
 pub fn handle_attack_sequence_start_requests(
     combatants_by_id: Res<CharactersById>,
     mut combatants: Query<(
@@ -70,6 +66,7 @@ pub fn handle_attack_sequence_start_requests(
             .get(combatant_skeleton_entity.0)
             .expect("to have the transform")
             .clone();
+
         // Calculate destination
         let direction =
             (combatant_transform.translation - target_transform.translation).normalize();
@@ -79,18 +76,35 @@ pub fn handle_attack_sequence_start_requests(
             destination[1],
             destination[2],
         ));
-        combatant_animation_manager.current_animation_name = "Run".to_string();
-        combatant_animation_manager.time_started = Some(Date::new_0().get_time() as u64);
+
+        let up = *combatant_transform.up().clone();
+        combatant_animation_manager.target_rotation = Some(
+            combatant_transform
+                .looking_at(
+                    combatant_animation_manager
+                        .destination
+                        .expect("declared above")
+                        .translation,
+                    up,
+                )
+                .rotation,
+        );
+        let time_started = Date::new_0().get_time() as u64;
+        combatant_animation_manager
+            .active_states
+            .insert(ActionSequenceStates::ApproachingTarget, Some(time_started));
 
         combatants_executing_attacks.0.insert(combatant_id);
 
+        // Start animation
         let animation_player_link = animation_player_links
             .get(combatant_skeleton_entity.0)
             .expect("to have linked the skeleton to it's animation player");
         let mut animation_player = animation_players
             .get_mut(animation_player_link.0)
             .expect("to have a valid animation player entity in the link");
-        let animation_handle = animations.0.get("Run").expect("to have a run animation");
+
+        let animation_handle = animations.0.get(RUN).expect("to have a run animation");
         animation_player
             .play_with_transition(animation_handle.clone(), Duration::from_millis(500))
             .repeat();
