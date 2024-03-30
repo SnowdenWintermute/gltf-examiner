@@ -1,6 +1,7 @@
 use crate::bevy_app::modular_character_plugin::animation_manager_component::ActionSequenceStates;
 use crate::bevy_app::modular_character_plugin::animation_manager_component::AnimationManagerComponent;
 use crate::bevy_app::modular_character_plugin::Animations;
+use crate::bevy_app::modular_character_plugin::HitRecoveryActivationEvent;
 use crate::frontend_common::animation_names::RUN_BACK;
 use crate::frontend_common::animation_names::SWORD_SLASH;
 use bevy::math::u64;
@@ -8,6 +9,7 @@ use bevy::prelude::*;
 use std::time::Duration;
 
 pub const SWORD_SLASH_PERCENT_COMPLETE_TRANSITION_THRESHOLD: f32 = 0.65;
+pub const SWORD_SLASH_HIT_ACTIVATION_PERCENT_COMPLETION: f32 = 0.45;
 
 pub fn process_combatant_swinging_weapons(
     animation_manager: &mut AnimationManagerComponent,
@@ -16,6 +18,7 @@ pub fn process_combatant_swinging_weapons(
     animations: &Res<Animations>,
     assets_animation_clips: &Res<Assets<AnimationClip>>,
     current_time: u64,
+    hit_recovery_activation_event_writer: &mut EventWriter<HitRecoveryActivationEvent>,
 ) {
     // - if duration threshold passed, activate returning
     let animation_handle = animations
@@ -26,6 +29,16 @@ pub fn process_combatant_swinging_weapons(
         .get(animation_handle)
         .expect("to have the clip");
     let percent_completed = animation_player.elapsed() / animation_clip.duration();
+
+    if percent_completed >= SWORD_SLASH_HIT_ACTIVATION_PERCENT_COMPLETION {
+        if let Some(current_targets) = animation_manager.current_targets.take() {
+            hit_recovery_activation_event_writer.send(HitRecoveryActivationEvent(Vec::from([(
+                current_targets[0],
+                10,
+            )])));
+        }
+    }
+
     if percent_completed >= SWORD_SLASH_PERCENT_COMPLETE_TRANSITION_THRESHOLD {
         animation_manager
             .active_states

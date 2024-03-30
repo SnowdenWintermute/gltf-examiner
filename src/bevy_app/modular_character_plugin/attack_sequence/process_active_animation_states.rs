@@ -8,6 +8,7 @@ use crate::bevy_app::modular_character_plugin::spawn_character::MainSkeletonEnti
 use crate::bevy_app::modular_character_plugin::Animations;
 use crate::bevy_app::modular_character_plugin::CharactersById;
 use crate::bevy_app::modular_character_plugin::CombatantsExecutingAttacks;
+use crate::bevy_app::modular_character_plugin::HitRecoveryActivationEvent;
 use crate::bevy_app::modular_character_plugin::HomeLocation;
 use crate::bevy_app::utils::link_animations::AnimationEntityLink;
 use bevy::prelude::*;
@@ -26,6 +27,7 @@ pub fn process_active_animation_states(
     mut animation_players: Query<&mut AnimationPlayer>,
     animations: Res<Animations>,
     assets_animation_clips: Res<Assets<AnimationClip>>,
+    mut hit_recovery_activation_event_writer: EventWriter<HitRecoveryActivationEvent>,
 ) {
     for combatant_id in combatants_executing_attacks.0.iter() {
         let combatant_entity = combatants_by_id
@@ -70,6 +72,7 @@ pub fn process_active_animation_states(
                     &animations,
                     &assets_animation_clips,
                     current_time,
+                    &mut hit_recovery_activation_event_writer,
                 ),
                 ActionSequenceStates::Returning => process_combatant_returning_to_home_position(
                     &mut skeleton_entity_transform,
@@ -86,6 +89,9 @@ pub fn process_active_animation_states(
                     &home_location.0,
                     current_time - time_started_option.expect("to have marked the start time"),
                 ),
+                ActionSequenceStates::HitRecovery => {
+                    // process_combatant_hit_recovery();
+                }
             }
         }
     }

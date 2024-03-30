@@ -1,3 +1,4 @@
+use super::CharacterId;
 use bevy::math::u64;
 use bevy::prelude::*;
 use std::collections::HashMap;
@@ -10,6 +11,7 @@ pub enum ActionSequenceStates {
     Swinging,
     Returning,
     Recentering,
+    HitRecovery,
 }
 
 #[derive(Component, Default)]
@@ -19,4 +21,5 @@ pub struct AnimationManagerComponent {
     pub last_location: Option<Transform>,
     pub target_rotation: Option<Quat>,
     pub last_rotation: Option<Quat>,
+    pub current_targets: Option<Vec<CharacterId>>,
 }

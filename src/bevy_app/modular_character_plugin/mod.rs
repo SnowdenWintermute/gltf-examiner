@@ -1,22 +1,19 @@
-use self::{
-    assign_skeleton_bones_to_characters::assign_skeleton_bones_to_characters,
-    attack_sequence::{
-        draw_direction_ray_gizmos::draw_directional_gizmos, handle_attack_sequence_start_requests,
-        process_active_animation_states::process_active_animation_states,
-    },
-    handle_animation_change_requests::handle_animation_change_requests,
-    notify_yew_that_assets_are_loaded::notify_yew_that_assets_are_loaded,
-    part_change_plugin::PartChangePlugin,
-    register_animations::register_animations,
-    run_animations::run_animations,
-    spawn_character::spawn_characters,
-};
+use self::assign_skeleton_bones_to_characters::assign_skeleton_bones_to_characters;
+use self::attack_sequence::draw_direction_ray_gizmos::draw_directional_gizmos;
+use self::attack_sequence::handle_attack_sequence_start_requests;
+use self::attack_sequence::process_active_animation_states::process_active_animation_states;
+use self::attack_sequence::start_combatant_hit_recoveries::start_combatant_hit_recoveries;
+use self::handle_animation_change_requests::handle_animation_change_requests;
+use self::notify_yew_that_assets_are_loaded::notify_yew_that_assets_are_loaded;
+use self::part_change_plugin::PartChangePlugin;
+use self::register_animations::register_animations;
+use self::run_animations::run_animations;
+use self::spawn_character::spawn_characters;
 use super::utils::link_animations::link_animations;
 use crate::bevy_app::asset_loader_plugin::AssetLoaderState;
-use bevy::{
-    prelude::*,
-    utils::{HashMap, HashSet},
-};
+use bevy::prelude::*;
+use bevy::utils::HashMap;
+use bevy::utils::HashSet;
 pub mod animation_manager_component;
 mod assemble_parts;
 mod assign_skeleton_bones_to_characters;
@@ -44,12 +41,14 @@ pub struct AttachedPartsReparentedEntities {
     parts_and_entities: HashMap<Entity, Vec<Entity>>,
 }
 #[derive(Resource, Default)]
-pub struct NextCharacterXLocation(f32);
-#[derive(Resource, Default)]
 pub struct CombatantsExecutingAttacks(HashSet<CharacterId>);
 
 #[derive(Default, Debug, Clone, Component)]
 pub struct HomeLocation(pub Transform);
+
+// EVENTS
+#[derive(Clone, Debug, Event)]
+pub struct HitRecoveryActivationEvent(Vec<(CharacterId, u16)>);
 
 pub struct ModularCharacterPlugin;
 impl Plugin for ModularCharacterPlugin {
@@ -58,8 +57,9 @@ impl Plugin for ModularCharacterPlugin {
             .init_resource::<CharactersById>()
             .init_resource::<SkeletonsAwaitingCharacterAssignment>()
             .init_resource::<Animations>()
-            .init_resource::<NextCharacterXLocation>()
             .init_resource::<CombatantsExecutingAttacks>()
+            .init_resource::<Events<HitRecoveryActivationEvent>>()
+            // .init_::<CombatantsExecutingAttacks>()
             .add_plugins(PartChangePlugin)
             .add_systems(
                 OnEnter(AssetLoaderState::RegisteringAnimations),
@@ -76,6 +76,7 @@ impl Plugin for ModularCharacterPlugin {
                     draw_directional_gizmos,
                     handle_attack_sequence_start_requests,
                     process_active_animation_states,
+                    start_combatant_hit_recoveries,
                 )
                     .run_if(in_state(AssetLoaderState::Done)),
             )

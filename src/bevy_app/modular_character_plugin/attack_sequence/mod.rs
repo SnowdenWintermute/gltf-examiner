@@ -2,10 +2,12 @@ pub mod draw_direction_ray_gizmos;
 pub mod move_entities_toward_destinations;
 pub mod process_active_animation_states;
 mod process_combatant_approaching_melee_target;
+mod process_combatant_hit_recovery;
 mod process_combatant_recentering;
 mod process_combatant_returning_to_home_position;
 mod process_combatant_swinging_weapons;
 mod rotate_transform_toward_target;
+pub mod start_combatant_hit_recoveries;
 mod translate_transform_toward_target;
 use super::animation_manager_component::ActionSequenceStates;
 use super::animation_manager_component::AnimationManagerComponent;
@@ -102,6 +104,7 @@ pub fn handle_attack_sequence_start_requests(
         combatant_animation_manager
             .active_states
             .insert(ActionSequenceStates::ApproachingTarget, Some(time_started));
+        combatant_animation_manager.current_targets = Some(Vec::from([event.0.target_id]));
 
         combatants_executing_attacks.0.insert(combatant_id);
 
