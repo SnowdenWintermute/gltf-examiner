@@ -1,30 +1,25 @@
-use crate::{
-    bevy_app::{
-        asset_loader_plugin::MyAssets,
-        modular_character_plugin::{
-            spawn_character::{
-                CharacterIdComponent, CharacterPartScenesAwaitingSpawn,
-                MainSkeletonBonesAndArmature,
-            },
-            spawn_scenes::spawn_scene,
-            CharactersById, HomeLocation,
-        },
-    },
-    comm_channels::CharacterPartSelectionEvent,
-    frontend_common::CharacterPartCategories,
-};
-use bevy::{gltf::Gltf, prelude::*};
+use crate::bevy_app::asset_loader_plugin::MyAssets;
+use crate::bevy_app::modular_character_plugin::spawn_combatant::CharacterPartScenesAwaitingSpawn;
+use crate::bevy_app::modular_character_plugin::spawn_combatant::CombatantIdComponent;
+use crate::bevy_app::modular_character_plugin::spawn_combatant::MainSkeletonBonesAndArmature;
+use crate::bevy_app::modular_character_plugin::spawn_scenes::spawn_scene;
+use crate::bevy_app::modular_character_plugin::CombatantsById;
+use crate::bevy_app::modular_character_plugin::HomeLocation;
+use crate::comm_channels::CharacterPartSelectionEvent;
+use crate::frontend_common::CharacterPartCategories;
+use bevy::gltf::Gltf;
+use bevy::prelude::*;
 
 pub fn spawn_new_parts(
     mut commands: Commands,
     mut characters_with_spawned_skeletons: Query<(
         Entity,
-        &CharacterIdComponent,
+        &CombatantIdComponent,
         &mut CharacterPartScenesAwaitingSpawn,
         &MainSkeletonBonesAndArmature,
     )>,
     mut part_selection_event_reader: EventReader<CharacterPartSelectionEvent>,
-    character_by_id: Res<CharactersById>,
+    character_by_id: Res<CombatantsById>,
     asset_pack: Res<MyAssets>,
     assets_gltf: Res<Assets<Gltf>>,
 ) {
@@ -73,6 +68,7 @@ pub fn spawn_part(
         CharacterPartCategories::Torso => asset_pack.torsos.get(file_name),
         CharacterPartCategories::Leg => asset_pack.legs.get(file_name),
         CharacterPartCategories::Weapon => asset_pack.weapons.get(file_name),
+        CharacterPartCategories::FullBodyMesh => asset_pack.non_humanoids.get(file_name),
     };
     //  - spawn new part and store entity id and category on character "awaiting spawn"
     let gltf_handle = gltf_handle_option.expect("to have loaded the gltf file asset");

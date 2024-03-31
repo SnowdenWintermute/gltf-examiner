@@ -37,7 +37,7 @@ impl Plugin for CommChannelPlugin {
 fn handle_yew_messages(
     mut bevy_receiver: ResMut<BevyReceiver>,
     mut part_selection_event_writer: EventWriter<CharacterPartSelectionEvent>,
-    mut spawn_character_event_writer: EventWriter<CharacterSpawnEvent>,
+    mut spawn_combatant_event_writer: EventWriter<CharacterSpawnEvent>,
     mut select_animation_event_writer: EventWriter<SelectAnimationEvent>,
     mut attack_sequence_event_writer: EventWriter<StartAttackSequenceEvent>,
 ) {
@@ -46,9 +46,16 @@ fn handle_yew_messages(
             MessageFromYew::SelectCharacterPart(part_selection) => {
                 part_selection_event_writer.send(CharacterPartSelectionEvent(part_selection));
             }
-            MessageFromYew::SpawnCharacterWithHomeLocation(character_id, home_location) => {
-                info!("got spawn character event");
-                spawn_character_event_writer.send(CharacterSpawnEvent(character_id, home_location));
+            MessageFromYew::SpawnCharacterWithHomeLocation(
+                character_id,
+                home_location,
+                species,
+            ) => {
+                spawn_combatant_event_writer.send(CharacterSpawnEvent(
+                    character_id,
+                    home_location,
+                    species,
+                ));
             }
             MessageFromYew::SelectAnimation(animation_name) => {
                 select_animation_event_writer.send(SelectAnimationEvent(animation_name));

@@ -1,5 +1,5 @@
 pub mod animation_names;
-use crate::bevy_app::modular_character_plugin::CharacterId;
+use crate::bevy_app::modular_character_plugin::CombatantId;
 use std::collections::HashSet;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -8,6 +8,7 @@ pub enum CharacterPartCategories {
     Torso,
     Leg,
     Weapon,
+    FullBodyMesh,
 }
 
 #[derive(Default, Debug, Clone, PartialEq)]
@@ -20,19 +21,25 @@ pub struct PartsByName {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CharacterPartSelection {
-    pub character_id: CharacterId,
+    pub character_id: CombatantId,
     pub name: String,
     pub category: CharacterPartCategories,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CharacterAnimationSelection {
-    pub character_id: CharacterId,
+    pub character_id: CombatantId,
     pub name: String,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct AttackCommand {
-    pub combatant_id: CharacterId,
-    pub target_id: CharacterId,
+    pub combatant_id: CombatantId,
+    pub target_id: CombatantId,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum CombatantSpecies {
+    Humanoid,
+    Spider,
 }

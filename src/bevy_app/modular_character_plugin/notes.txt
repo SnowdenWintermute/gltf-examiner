@@ -1,10 +1,10 @@
 spawn character 
  - spawn skeleton and store its entity id on the character
  - add character name to list of characters resource
- - add skeleton entity to skeletons_awaiting_character_assignment resource
+ - add skeleton entity to skeletons_awaiting_combatant_assignment resource
  - upon skeleton load 
    - add its bones to the corresponding character
-   - remove skeleton entity from skeletons_awaiting_character_assignment resource
+   - remove skeleton entity from skeletons_awaiting_combatant_assignment resource
 
 upon part change request
  - get associated character

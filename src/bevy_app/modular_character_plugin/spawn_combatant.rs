@@ -1,15 +1,28 @@
 use super::animation_manager_component::AnimationManagerComponent;
-use super::{spawn_scenes::spawn_scene, CharactersById, SkeletonsAwaitingCharacterAssignment};
-use super::{CharacterId, HomeLocation};
-use crate::comm_channels::{BevyTransmitter, MessageFromBevy};
+use super::spawn_scenes::spawn_scene;
+use super::CombatantId;
+use super::CombatantsById;
+use super::HomeLocation;
+use super::SkeletonsAwaitingCombatantAssignment;
+use crate::bevy_app::asset_loader_plugin::MyAssets;
+use crate::comm_channels::BevyTransmitter;
+use crate::comm_channels::CharacterSpawnEvent;
+use crate::comm_channels::MessageFromBevy;
 use crate::frontend_common::CharacterPartCategories;
-use crate::{bevy_app::asset_loader_plugin::MyAssets, comm_channels::CharacterSpawnEvent};
-use bevy::{gltf::Gltf, prelude::*, utils::HashMap, utils::HashSet};
+use crate::frontend_common::CombatantSpecies;
+use bevy::gltf::Gltf;
+use bevy::prelude::*;
+use bevy::utils::HashMap;
+use bevy::utils::HashSet;
 use bevy_mod_billboard::BillboardTextBundle;
 
 // CHARACTER COMPONENTS
 #[derive(Component)]
-pub struct CharacterIdComponent(pub u32);
+pub struct CombatantIdComponent(pub u32);
+#[derive(Component)]
+pub struct CombatantMainArmatureMarker;
+#[derive(Component)]
+pub struct CombatantMainArmatureEntityLink(pub Entity);
 #[derive(Component, Debug)]
 pub struct MainSkeletonEntity(pub Entity);
 #[derive(Component, Debug)]
@@ -22,65 +35,81 @@ pub struct CharacterPartScenesAwaitingSpawn(pub HashMap<CharacterPartCategories,
 pub struct CharacterAttachedPartScenes(pub HashMap<CharacterPartCategories, Entity>);
 #[derive(Component, Default, Clone)]
 pub struct HitboxRadius(pub f32);
+#[derive(Component, Clone, Debug)]
+pub struct CombatantSpeciesComponent(pub CombatantSpecies);
 
-pub fn spawn_characters(
+pub fn spawn_combatants(
     mut commands: Commands,
     mut character_spawn_event_reader: EventReader<CharacterSpawnEvent>,
     asset_pack: Res<MyAssets>,
     assets_gltf: Res<Assets<Gltf>>,
-    mut characters_by_id: ResMut<CharactersById>,
-    mut skeletons_awaiting_character_assignment: ResMut<SkeletonsAwaitingCharacterAssignment>,
+    mut characters_by_id: ResMut<CombatantsById>,
+    mut skeletons_awaiting_combatant_assignment: ResMut<SkeletonsAwaitingCombatantAssignment>,
     transmitter: ResMut<BevyTransmitter>,
 ) {
     for event in character_spawn_event_reader.read() {
         let character_id = event.0;
         let home_location = &event.1;
-        spawn_character(
+        let species = &event.2;
+
+        let file_name = match species {
+            CombatantSpecies::Humanoid => "main_skeleton.glb",
+            CombatantSpecies::Spider => "spider_main_skeleton.glb",
+        };
+
+        let skeleton_handle = asset_pack
+            .main_skeletons_with_animations
+            .get(file_name)
+            .expect("to have loaded the skeleton glb");
+
+        spawn_combatant(
             &mut commands,
             &asset_pack,
             &assets_gltf,
             &mut characters_by_id,
-            &mut skeletons_awaiting_character_assignment,
+            &mut skeletons_awaiting_combatant_assignment,
             home_location.clone(),
             character_id,
             &transmitter,
+            skeleton_handle,
+            file_name.to_string(),
+            species.clone(),
         )
     }
 }
 
-pub fn spawn_character(
+pub fn spawn_combatant(
     commands: &mut Commands,
     asset_pack: &Res<MyAssets>,
     assets_gltf: &Res<Assets<Gltf>>,
-    characters_by_id: &mut ResMut<CharactersById>,
-    skeletons_awaiting_character_assignment: &mut ResMut<SkeletonsAwaitingCharacterAssignment>,
+    characters_by_id: &mut ResMut<CombatantsById>,
+    skeletons_awaiting_combatant_assignment: &mut ResMut<SkeletonsAwaitingCombatantAssignment>,
     home_location: HomeLocation,
-    character_id: CharacterId,
+    character_id: CombatantId,
     transmitter: &ResMut<BevyTransmitter>,
+    skeleton_handle: &Handle<Gltf>,
+    file_name: String,
+    species: CombatantSpecies,
 ) {
     // - spawn skeleton and store its entity id on the character
-    let skeleton_handle = asset_pack
-        .main_skeletons_with_animations
-        .get("main_skeleton.glb")
-        .expect("to have loaded the skeleton glb");
 
     let skeleton_entity = spawn_scene(
         commands,
         &assets_gltf,
         skeleton_handle.clone(),
-        "main_skeleton.glb".to_string(),
+        file_name,
         false,
         home_location.clone(),
     )
     .expect("to have a skeleton gltf handle");
 
-    // - add skeleton entity to skeletons_awaiting_character_assignment resource
-    skeletons_awaiting_character_assignment
+    // - add skeleton entity to skeletons_awaiting_combatant_assignment resource
+    skeletons_awaiting_combatant_assignment
         .0
-        .insert(character_id, skeleton_entity);
+        .insert(character_id, (skeleton_entity, species.clone()));
 
     let character_entity_commands = commands.spawn((
-        CharacterIdComponent(character_id),
+        CombatantIdComponent(character_id),
         MainSkeletonEntity(skeleton_entity),
         CharacterAttachedPartScenes(HashMap::new()),
         CharacterPartScenesAwaitingSpawn(HashMap::new()),
@@ -115,5 +144,5 @@ pub fn spawn_character(
     billboard_entity_commands.set_parent(skeleton_entity);
 
     // NOTIFY YEW
-    transmitter.send(MessageFromBevy::CombatantSpawned(character_id));
+    let _ = transmitter.send(MessageFromBevy::CombatantSpawned(character_id));
 }

@@ -3,7 +3,7 @@
 // use yewdux::use_store;
 
 // #[function_component(SpawnCharacterButton)]
-// pub fn spawn_character_button() -> Html {
+// pub fn spawn_combatant_button() -> Html {
 //     let (app_state, dispatch) = use_store::<AppStore>();
 
 //     let cloned_app_state = app_state.clone();

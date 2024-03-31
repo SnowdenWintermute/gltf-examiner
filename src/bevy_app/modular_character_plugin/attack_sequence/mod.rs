@@ -11,11 +11,11 @@ pub mod start_combatant_hit_recoveries;
 mod translate_transform_toward_target;
 use super::animation_manager_component::ActionSequenceStates;
 use super::animation_manager_component::AnimationManagerComponent;
-use super::spawn_character::CharacterIdComponent;
-use super::spawn_character::HitboxRadius;
-use super::spawn_character::MainSkeletonEntity;
+use super::spawn_combatant::CombatantIdComponent;
+use super::spawn_combatant::HitboxRadius;
+use super::spawn_combatant::MainSkeletonEntity;
 use super::Animations;
-use super::CharactersById;
+use super::CombatantsById;
 use super::CombatantsExecutingAttacks;
 use crate::bevy_app::utils::link_animations::AnimationEntityLink;
 use crate::comm_channels::StartAttackSequenceEvent;
@@ -26,9 +26,9 @@ use js_sys::Date;
 use std::time::Duration;
 
 pub fn handle_attack_sequence_start_requests(
-    combatants_by_id: Res<CharactersById>,
+    combatants_by_id: Res<CombatantsById>,
     mut combatants: Query<(
-        &CharacterIdComponent,
+        &CombatantIdComponent,
         &MainSkeletonEntity,
         &mut AnimationManagerComponent,
         &HitboxRadius,
@@ -38,7 +38,7 @@ pub fn handle_attack_sequence_start_requests(
     transforms: Query<&mut Transform>,
     mut attack_sequence_commands_event_reader: EventReader<StartAttackSequenceEvent>,
     animations: Res<Animations>,
-    mut combatants_executing_attacks: ResMut<CombatantsExecutingAttacks>,
+    mut combatants_with_active_action_states: ResMut<CombatantsExecutingAttacks>,
 ) {
     for event in attack_sequence_commands_event_reader.read() {
         let AttackCommand {
@@ -106,7 +106,7 @@ pub fn handle_attack_sequence_start_requests(
             .insert(ActionSequenceStates::ApproachingTarget, Some(time_started));
         combatant_animation_manager.current_targets = Some(Vec::from([event.0.target_id]));
 
-        combatants_executing_attacks.0.insert(combatant_id);
+        combatants_with_active_action_states.0.insert(combatant_id);
 
         // Start animation
         let animation_player_link = animation_player_links

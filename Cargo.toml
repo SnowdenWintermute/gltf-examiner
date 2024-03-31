@@ -20,6 +20,7 @@ yewdux = "0.10.0"
 # bevy
 bevy_panorbit_camera = "0.16.0"
 bevy_mod_billboard = { git = "https://github.com/kulkalkul/bevy_mod_billboard" }
+# bevy_polyline = { git = "https://github.com/ForesightMiningSoftwareCorporation/bevy_polyline" }
 bevy_asset_loader ="0.20"
 [dependencies.bevy]
 version = "0.13.0"

@@ -1,11 +1,9 @@
-use crate::bevy_app::{
-    modular_character_plugin::AttachedPartsReparentedEntities,
-    utils::{
-        collect_hierarchy::get_all_named_entities_in_hierarchy,
-        find_child_with_name_containing::find_child_with_name_containing, zero_transform,
-    },
-};
-use bevy::{prelude::*, utils::HashMap};
+use crate::bevy_app::modular_character_plugin::AttachedPartsReparentedEntities;
+use crate::bevy_app::utils::collect_hierarchy::get_all_named_entities_in_hierarchy;
+use crate::bevy_app::utils::find_child_with_name_containing::find_child_with_name_containing;
+use crate::bevy_app::utils::zero_transform;
+use bevy::prelude::*;
+use bevy::utils::HashMap;
 
 pub fn attach_part_to_main_skeleton(
     commands: &mut Commands,
@@ -31,7 +29,7 @@ pub fn attach_part_to_main_skeleton(
         all_entities_with_children,
         names,
         &part_scene_entity,
-        "CharacterArmature",
+        "Armature",
     );
 
     if let Some(part_armature) = part_armature_option {
@@ -41,11 +39,6 @@ pub fn attach_part_to_main_skeleton(
         part_armature_entity_commands.set_parent(*main_armature_entity);
         // set visibility
         if let Ok(mut visibility) = visibility_query.get_mut(part_armature) {
-            // info!(
-            //     "changing visibility for {:?}, was {:?}",
-            //     names.get(*part_scene_entity),
-            //     visibility
-            // );
             *visibility = Visibility::Visible;
         }
     }

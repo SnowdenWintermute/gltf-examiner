@@ -1,9 +1,10 @@
 pub mod comm_channel_bevy_plugin;
-use crate::bevy_app::modular_character_plugin::CharacterId;
+use crate::bevy_app::modular_character_plugin::CombatantId;
 use crate::bevy_app::modular_character_plugin::HomeLocation;
 use crate::frontend_common::AttackCommand;
 use crate::frontend_common::CharacterAnimationSelection;
 use crate::frontend_common::CharacterPartSelection;
+use crate::frontend_common::CombatantSpecies;
 use crate::frontend_common::PartsByName;
 use bevy::prelude::*;
 use broadcast::Receiver;
@@ -15,7 +16,7 @@ use tokio::sync::broadcast;
 #[derive(Debug, Clone)]
 pub enum MessageFromYew {
     SelectCharacterPart(CharacterPartSelection),
-    SpawnCharacterWithHomeLocation(CharacterId, HomeLocation),
+    SpawnCharacterWithHomeLocation(CombatantId, HomeLocation, CombatantSpecies),
     SelectAnimation(CharacterAnimationSelection),
     ExecuteAttackSequence(AttackCommand),
 }
@@ -23,7 +24,7 @@ pub enum MessageFromYew {
 pub struct CharacterPartSelectionEvent(pub CharacterPartSelection);
 
 #[derive(Clone, Debug, Event)]
-pub struct CharacterSpawnEvent(pub CharacterId, pub HomeLocation);
+pub struct CharacterSpawnEvent(pub CombatantId, pub HomeLocation, pub CombatantSpecies);
 
 #[derive(Clone, Debug, Event)]
 pub struct SelectAnimationEvent(pub CharacterAnimationSelection);
@@ -36,7 +37,7 @@ pub struct StartAttackSequenceEvent(pub AttackCommand);
 pub enum MessageFromBevy {
     PartNames(PartsByName),
     AnimationsAvailable(HashSet<String>),
-    CombatantSpawned(CharacterId),
+    CombatantSpawned(CombatantId),
     AssetsLoaded,
 }
 // CHANNELS

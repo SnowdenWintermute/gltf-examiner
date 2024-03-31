@@ -1,7 +1,7 @@
 // use crate::bevy_app::{
 //     modular_character_plugin::{
 //         animation_manager_component::AnimationManagerComponent,
-//         spawn_character::MainSkeletonEntity, Animations, CharactersById,
+//         spawn_combatant::MainSkeletonEntity, Animations, CombatantsById,
 //         CombatantsExecutingAttacks, HomeLocation,
 //     },
 //     utils::link_animations::AnimationEntityLink,
@@ -16,20 +16,20 @@
 // const SPEED_MODIFIER: f32 = 0.2;
 
 // pub fn move_entities_toward_destinations(
-//     combatants_by_id: Res<CharactersById>,
+//     combatants_by_id: Res<CombatantsById>,
 //     mut combatants: Query<(
 //         &MainSkeletonEntity,
 //         &mut AnimationManagerComponent,
 //         &HomeLocation,
 //     )>,
 //     mut transforms: Query<&mut Transform>,
-//     combatants_executing_attacks: ResMut<CombatantsExecutingAttacks>,
+//     combatants_with_active_action_states: ResMut<CombatantsExecutingAttacks>,
 //     animation_player_links: Query<&AnimationEntityLink>,
 //     mut animation_players: Query<&mut AnimationPlayer>,
 //     animations: Res<Animations>,
 //     assets_animation_clips: Res<Assets<AnimationClip>>,
 // ) {
-//     for combatant_id in combatants_executing_attacks.0.iter() {
+//     for combatant_id in combatants_with_active_action_states.0.iter() {
 //         let combatant_entity = combatants_by_id
 //             .0
 //             .get(combatant_id)

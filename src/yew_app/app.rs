@@ -1,11 +1,12 @@
-use super::{store::AppStore, Props};
-use crate::{
-    comm_channels::MessageFromBevy,
-    yew_app::character_part_selection_menu::CharacterPartSelectionMenu,
-};
-use gloo::console::{info, log};
+use super::store::AppStore;
+use super::Props;
+use crate::comm_channels::MessageFromBevy;
+use crate::yew_app::character_part_selection_menu::CharacterPartSelectionMenu;
+// use gloo::console::info;
+// use gloo::console::log;
 use std::ops::Deref;
-use yew::{platform::spawn_local, prelude::*};
+use yew::platform::spawn_local;
+use yew::prelude::*;
 use yewdux::use_store;
 
 #[function_component(App)]
@@ -37,7 +38,7 @@ pub fn app(props: &Props) -> Html {
                     while let Ok(subsequent_message) = receiver.try_recv() {
                         messages.push(subsequent_message)
                     }
-                    log!(format!("got messages from bevy: {:#?}", messages));
+                    // log!(format!("got messages from bevy: {:#?}", messages));
                     most_recent_message_from_bevy_state.set(messages);
                 }
             });
@@ -50,7 +51,7 @@ pub fn app(props: &Props) -> Html {
     use_effect_with(most_recent_message_from_bevy_state, move |_| {
         let mut message_to_enqueue = cloned_most_recent_message_from_bevy_state.deref().clone();
 
-        log!(format!("enqueuing message : {:#?}", message_to_enqueue));
+        // log!(format!("enqueuing message : {:#?}", message_to_enqueue));
         let mut current_messages = cloned_queued_bevy_messages_state.deref().clone();
         current_messages.append(&mut message_to_enqueue);
         cloned_queued_bevy_messages_state.set(current_messages);
@@ -65,7 +66,7 @@ pub fn app(props: &Props) -> Html {
         move |cloned_queued_bevy_messages_state| {
             let messages = cloned_queued_bevy_messages_state.deref();
             for message in messages {
-                log!(format!("processing message {:?}", message));
+                // log!(format!("processing message {:?}", message));
                 match message {
                     MessageFromBevy::PartNames(part_names) => cloned_dispatch
                         .reduce_mut(|store| store.parts_available = part_names.clone()),
@@ -75,7 +76,7 @@ pub fn app(props: &Props) -> Html {
                         cloned_dispatch.reduce_mut(|store| store.character_ids.push(*combatant_id))
                     }
                     MessageFromBevy::AssetsLoaded => {
-                        info!("setting assets loaded");
+                        // info!("setting assets loaded");
                         cloned_dispatch.reduce_mut(|store| store.bevy_assets_loaded = true)
                     }
                 }

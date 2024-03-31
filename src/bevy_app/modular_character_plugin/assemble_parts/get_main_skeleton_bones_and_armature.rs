@@ -20,7 +20,7 @@ pub fn get_main_skeleton_bones_and_armature(
         all_entities_with_children,
         &names,
         &main_skeleton_entity,
-        "CharacterArmature",
+        "Armature",
     )
     .expect("the skeleton to have an armature");
 

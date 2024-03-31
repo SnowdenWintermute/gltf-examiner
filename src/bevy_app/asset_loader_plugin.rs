@@ -29,8 +29,13 @@ pub struct MyAssets {
         collection(typed, mapped)
     )]
     pub heads: HashMap<String, Handle<Gltf>>,
-    #[asset(paths("main_skeleton.glb"), collection(typed, mapped))]
+    #[asset(
+        paths("main_skeleton.glb", "spider_main_skeleton.glb"),
+        collection(typed, mapped)
+    )]
     pub main_skeletons_with_animations: HashMap<String, Handle<Gltf>>,
+    #[asset(paths("spider_full.glb"), collection(typed, mapped))]
+    pub non_humanoids: HashMap<String, Handle<Gltf>>,
     #[asset(paths("scifi_torso.glb", "witch_torso.glb"), collection(typed, mapped))]
     pub torsos: HashMap<String, Handle<Gltf>>,
     #[asset(paths("scifi_legs.glb", "witch_legs.glb"), collection(typed, mapped))]

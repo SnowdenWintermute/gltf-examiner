@@ -1,4 +1,4 @@
-use super::{spawn_character::MainSkeletonEntity, Animations, CharactersById};
+use super::{spawn_combatant::MainSkeletonEntity, Animations, CombatantsById};
 use crate::{
     bevy_app::utils::link_animations::AnimationEntityLink, comm_channels::SelectAnimationEvent,
 };
@@ -8,7 +8,7 @@ use std::time::Duration;
 pub fn handle_animation_change_requests(
     mut animation_player_query: Query<&mut AnimationPlayer>,
     characters_with_animation_player_links: Query<&AnimationEntityLink, With<AnimationEntityLink>>,
-    characters_by_id: Res<CharactersById>,
+    characters_by_id: Res<CombatantsById>,
     main_skeletons_query: Query<&MainSkeletonEntity>,
     animations: Res<Animations>,
     mut animation_change_request_event_reader: EventReader<SelectAnimationEvent>,
