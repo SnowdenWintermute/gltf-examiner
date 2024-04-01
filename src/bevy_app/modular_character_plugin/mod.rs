@@ -3,6 +3,7 @@ use self::attack_sequence::draw_direction_ray_gizmos::draw_directional_gizmos;
 use self::attack_sequence::handle_attack_sequence_start_requests;
 use self::attack_sequence::process_active_animation_states::process_active_animation_states;
 use self::attack_sequence::start_combatant_hit_recoveries::start_combatant_hit_recoveries;
+use self::draw_aabbs::draw_aabbs;
 use self::handle_animation_change_requests::handle_animation_change_requests;
 use self::notify_yew_that_assets_are_loaded::notify_yew_that_assets_are_loaded;
 use self::part_change_plugin::PartChangePlugin;
@@ -20,13 +21,13 @@ pub mod animation_manager_component;
 mod assemble_parts;
 mod assign_skeleton_bones_to_combatants;
 mod attack_sequence;
+mod draw_aabbs;
 mod handle_animation_change_requests;
 mod notify_yew_that_assets_are_loaded;
 pub mod part_change_plugin;
 mod register_animations;
 mod run_animations;
 mod spawn_combatant;
-mod spawn_combatants_in_battle_locations;
 pub mod spawn_scenes;
 mod update_scene_aabbs;
 
@@ -68,7 +69,7 @@ impl Plugin for ModularCharacterPlugin {
             .add_plugins(PartChangePlugin)
             .add_systems(
                 OnEnter(AssetLoaderState::RegisteringAnimations),
-                register_animations,
+                (register_animations, draw_aabbs),
             )
             .add_systems(
                 Update,
