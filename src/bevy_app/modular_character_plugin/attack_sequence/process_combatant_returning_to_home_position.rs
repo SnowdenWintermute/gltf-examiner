@@ -2,7 +2,9 @@ use super::translate_transform_toward_target::translate_transform_toward_target;
 use crate::bevy_app::modular_character_plugin::animation_manager_component::ActionSequenceStates;
 use crate::bevy_app::modular_character_plugin::animation_manager_component::AnimationManagerComponent;
 use crate::bevy_app::modular_character_plugin::Animations;
-use crate::frontend_common::animation_names::IDLE_SWORD;
+use crate::frontend_common::animation_names::AnimationType;
+use crate::frontend_common::animation_names::CombatantAnimations;
+use crate::frontend_common::CombatantSpecies;
 use bevy::math::u64;
 use bevy::prelude::*;
 use std::time::Duration;
@@ -18,6 +20,7 @@ pub fn process_combatant_returning_to_home_position(
     animation_player: &mut AnimationPlayer,
     animations: &Res<Animations>,
     current_time: u64,
+    species: &CombatantSpecies,
 ) {
     // - move toward destination
     let percent_distance_travelled = translate_transform_toward_target(
@@ -35,10 +38,11 @@ pub fn process_combatant_returning_to_home_position(
             .active_states
             .contains_key(&ActionSequenceStates::Recentering)
     {
+        let anim_name = species.animation_name(AnimationType::Idle);
         // - start playing animation
         let animation_handle = animations
             .0
-            .get(IDLE_SWORD)
+            .get(&anim_name)
             .expect("to have this animation");
         animation_player
             .play_with_transition(animation_handle.clone(), Duration::from_millis(1000))

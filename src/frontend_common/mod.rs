@@ -41,5 +41,6 @@ pub struct AttackCommand {
 #[derive(Debug, Clone, PartialEq)]
 pub enum CombatantSpecies {
     Humanoid,
-    Spider,
+    Wasp,
+    Frog,
 }

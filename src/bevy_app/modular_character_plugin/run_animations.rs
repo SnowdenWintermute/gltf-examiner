@@ -1,7 +1,8 @@
 use super::spawn_combatant::CombatantSpeciesComponent;
 use super::Animations;
 use crate::bevy_app::utils::link_animations::AnimationEntityLink;
-use crate::frontend_common::CombatantSpecies;
+use crate::frontend_common::animation_names::AnimationType;
+use crate::frontend_common::animation_names::CombatantAnimations;
 use bevy::prelude::*;
 
 pub fn run_animations(
@@ -17,18 +18,14 @@ pub fn run_animations(
             .get_mut(animation_player_entity_link.0)
             .expect("to have an animation player on the main skeleton");
 
-        let idle_animation_name = match species.0 {
-            CombatantSpecies::Humanoid => "Idle",
-            CombatantSpecies::Spider => "Spider_Idle",
-        };
-
+        let idle_animation_name = species.0.animation_name(AnimationType::Idle);
         info!("RUNNING ANIMATIONS, {idle_animation_name}");
 
         animation_player
             .play(
                 animations
                     .0
-                    .get(idle_animation_name)
+                    .get(&idle_animation_name)
                     .expect("to have an animation by this name")
                     .clone_weak(),
             )

@@ -12,6 +12,7 @@ mod translate_transform_toward_target;
 use super::animation_manager_component::ActionSequenceStates;
 use super::animation_manager_component::AnimationManagerComponent;
 use super::spawn_combatant::CombatantIdComponent;
+use super::spawn_combatant::CombatantSpeciesComponent;
 use super::spawn_combatant::HitboxRadius;
 use super::spawn_combatant::MainSkeletonEntity;
 use super::Animations;
@@ -19,8 +20,10 @@ use super::CombatantsById;
 use super::CombatantsExecutingAttacks;
 use crate::bevy_app::utils::link_animations::AnimationEntityLink;
 use crate::comm_channels::StartAttackSequenceEvent;
-use crate::frontend_common::animation_names::RUN;
+use crate::frontend_common::animation_names::AnimationType;
+use crate::frontend_common::animation_names::CombatantAnimations;
 use crate::frontend_common::AttackCommand;
+use crate::frontend_common::CombatantSpecies;
 use bevy::prelude::*;
 use js_sys::Date;
 use std::time::Duration;
@@ -33,6 +36,7 @@ pub fn handle_attack_sequence_start_requests(
         &mut AnimationManagerComponent,
         &HitboxRadius,
     )>,
+    species_query: Query<&CombatantSpeciesComponent>,
     animation_player_links: Query<&AnimationEntityLink>,
     mut animation_players: Query<&mut AnimationPlayer>,
     transforms: Query<&mut Transform>,
@@ -68,6 +72,10 @@ pub fn handle_attack_sequence_start_requests(
         let (_, combatant_skeleton_entity, mut combatant_animation_manager, _) = combatants
             .get_mut(*combatant_entity)
             .expect("to have the combatant");
+
+        let combatant_species = species_query
+            .get(combatant_skeleton_entity.0)
+            .expect("to have a species on the skeleton");
 
         if combatant_animation_manager.active_states.len() > 0 {
             continue;
@@ -116,7 +124,12 @@ pub fn handle_attack_sequence_start_requests(
             .get_mut(animation_player_link.0)
             .expect("to have a valid animation player entity in the link");
 
-        let animation_handle = animations.0.get(RUN).expect("to have a run animation");
+        let anim_name = combatant_species.0.animation_name(AnimationType::Run);
+
+        let animation_handle = animations
+            .0
+            .get(&anim_name)
+            .expect("to have a run animation");
         animation_player
             .play_with_transition(animation_handle.clone(), Duration::from_millis(500))
             .repeat();

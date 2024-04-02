@@ -3,7 +3,7 @@ use crate::bevy_app::modular_character_plugin::animation_manager_component::Acti
 use crate::bevy_app::modular_character_plugin::animation_manager_component::AnimationManagerComponent;
 use crate::bevy_app::modular_character_plugin::animation_manager_component::HpChangeNumber;
 use crate::bevy_app::modular_character_plugin::spawn_combatant::CombatantMainArmatureEntityLink;
-use crate::bevy_app::modular_character_plugin::spawn_combatant::CombatantMainArmatureMarker;
+use crate::bevy_app::modular_character_plugin::spawn_combatant::CombatantSpeciesComponent;
 use crate::bevy_app::modular_character_plugin::spawn_combatant::MainSkeletonEntity;
 use crate::bevy_app::modular_character_plugin::update_scene_aabbs::SceneAabb;
 use crate::bevy_app::modular_character_plugin::Animations;
@@ -11,7 +11,9 @@ use crate::bevy_app::modular_character_plugin::CombatantsById;
 use crate::bevy_app::modular_character_plugin::CombatantsExecutingAttacks;
 use crate::bevy_app::modular_character_plugin::HitRecoveryActivationEvent;
 use crate::bevy_app::utils::link_animations::AnimationEntityLink;
-use crate::frontend_common::animation_names::HIT_RECOVERY;
+use crate::frontend_common::animation_names::AnimationType;
+use crate::frontend_common::animation_names::CombatantAnimations;
+use crate::frontend_common::CombatantSpecies;
 use bevy::prelude::*;
 use bevy_mod_billboard::BillboardDepth;
 use bevy_mod_billboard::BillboardTextBundle;
@@ -26,6 +28,7 @@ pub fn start_combatant_hit_recoveries(
         &mut AnimationManagerComponent,
         &CombatantMainArmatureEntityLink,
     )>,
+    species_query: Query<&CombatantSpeciesComponent>,
     mut combatants_with_active_action_states: ResMut<CombatantsExecutingAttacks>,
     animation_player_links: Query<&AnimationEntityLink>,
     mut animation_players: Query<&mut AnimationPlayer>,
@@ -48,6 +51,10 @@ pub fn start_combatant_hit_recoveries(
             let (skeleton_entity, mut animation_manager, main_armature_entity_link) = combatants
                 .get_mut(*target_entity)
                 .expect("to have the combatant");
+
+            let species = species_query
+                .get(skeleton_entity.0)
+                .expect("to have a species");
             animation_manager
                 .active_states
                 .insert(ActionSequenceStates::HitRecovery, Some(current_time));
@@ -101,10 +108,12 @@ pub fn start_combatant_hit_recoveries(
                 .get_mut(animation_player_link.0)
                 .expect("to have a valid animation player entity in the link");
 
+            let anim_name = species.0.animation_name(AnimationType::HitRecovery);
+
             let animation_handle = animations
                 .0
-                .get(HIT_RECOVERY)
-                .expect("to have a run animation");
+                .get(&anim_name)
+                .expect("to have a the animation");
             animation_player
                 .start_with_transition(animation_handle.clone(), Duration::from_millis(500));
         }

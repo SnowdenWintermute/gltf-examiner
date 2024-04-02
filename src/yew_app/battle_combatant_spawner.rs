@@ -4,6 +4,7 @@ use crate::frontend_common::CombatantSpecies;
 use crate::yew_app::store::AppStore;
 use bevy::transform::components::Transform;
 use gloo::console::info;
+use rand::Rng;
 use std::f32::consts::PI;
 use yew::prelude::*;
 use yewdux::use_store;
@@ -22,7 +23,7 @@ pub fn battle_combatant_spawner() -> Html {
         }
         // info!("useffect detected assets loaded");
         if let Some(transmitter) = &cloned_app_state.transmitter_option {
-            let mut home_location = HomeLocation(Transform::from_xyz(0.0, 0.0, -1.5));
+            let mut home_location = HomeLocation(Transform::from_xyz(-1.0, 0.0, -1.5));
             home_location.0.rotate_y(PI);
             for _ in 0..=2 as u32 {
                 cloned_dispatch.reduce_mut(|store| {
@@ -38,15 +39,22 @@ pub fn battle_combatant_spawner() -> Html {
                 home_location.0.translation.x += 1.0;
             }
 
-            let mut home_location = HomeLocation(Transform::from_xyz(0.0, 0.0, 1.5));
+            let mut home_location = HomeLocation(Transform::from_xyz(-1.0, 0.0, 1.5));
 
             for _ in 3..=5 as u32 {
                 cloned_dispatch.reduce_mut(|store| {
+                    let mut rng = rand::thread_rng();
+                    let rolled = rng.gen_range(1..=100);
+                    let species = if rolled >= 51 {
+                        CombatantSpecies::Wasp
+                    } else {
+                        CombatantSpecies::Frog
+                    };
                     transmitter
                         .send(MessageFromYew::SpawnCharacterWithHomeLocation(
                             store.next_character_id,
                             home_location.clone(),
-                            CombatantSpecies::Spider,
+                            species,
                         ))
                         .expect("could not send event");
                     store.next_character_id += 1

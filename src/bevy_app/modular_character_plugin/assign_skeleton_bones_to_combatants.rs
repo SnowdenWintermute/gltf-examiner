@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use super::assemble_parts::get_main_skeleton_bones_and_armature::get_main_skeleton_bones_and_armature;
 use super::part_change_plugin::spawn_new_parts::spawn_part;
 use super::spawn_combatant::CharacterPartScenesAwaitingSpawn;
@@ -70,51 +72,29 @@ pub fn assign_skeleton_bones_to_combatants(
             if let Ok(mut parts_awaiting_spawn) =
                 parts_awaiting_spawn_query.get_mut(*character_entity)
             {
-                match species {
-                    CombatantSpecies::Humanoid => {
-                        spawn_part(
-                            &"scifi_torso.glb".to_string(),
-                            &CharacterPartCategories::Torso,
-                            &mut commands,
-                            &asset_pack,
-                            &assets_gltf,
-                            &mut parts_awaiting_spawn,
-                        );
-                        spawn_part(
-                            &"scifi_head.glb".to_string(),
-                            &CharacterPartCategories::Head,
-                            &mut commands,
-                            &asset_pack,
-                            &assets_gltf,
-                            &mut parts_awaiting_spawn,
-                        );
-                        spawn_part(
-                            &"scifi_legs.glb".to_string(),
-                            &CharacterPartCategories::Leg,
-                            &mut commands,
-                            &asset_pack,
-                            &assets_gltf,
-                            &mut parts_awaiting_spawn,
-                        );
-                        spawn_part(
-                            &"sword.glb".to_string(),
-                            &CharacterPartCategories::Weapon,
-                            &mut commands,
-                            &asset_pack,
-                            &assets_gltf,
-                            &mut parts_awaiting_spawn,
-                        );
+                let parts_to_spawn = match species {
+                    CombatantSpecies::Humanoid => Vec::from([
+                        ("scifi_torso.glb", CharacterPartCategories::Torso),
+                        ("scifi_head.glb", CharacterPartCategories::Head),
+                        ("scifi_legs.glb", CharacterPartCategories::Leg),
+                        ("sword.glb", CharacterPartCategories::Weapon),
+                    ]),
+                    CombatantSpecies::Wasp => {
+                        Vec::from([("wasp_full.glb", CharacterPartCategories::FullBodyMesh)])
                     }
-                    CombatantSpecies::Spider => {
-                        spawn_part(
-                            &"spider_full.glb".to_string(),
-                            &CharacterPartCategories::FullBodyMesh,
-                            &mut commands,
-                            &asset_pack,
-                            &assets_gltf,
-                            &mut parts_awaiting_spawn,
-                        );
+                    CombatantSpecies::Frog => {
+                        Vec::from([("frog_full.glb", CharacterPartCategories::FullBodyMesh)])
                     }
+                };
+                for (part_name, category) in parts_to_spawn {
+                    spawn_part(
+                        &part_name.to_string(),
+                        &category,
+                        &mut commands,
+                        &asset_pack,
+                        &assets_gltf,
+                        &mut parts_awaiting_spawn,
+                    );
                 }
             }
         }

@@ -5,6 +5,7 @@ use super::process_combatant_returning_to_home_position::process_combatant_retur
 use super::process_combatant_swinging_weapons::process_combatant_swinging_weapons;
 use crate::bevy_app::modular_character_plugin::animation_manager_component::ActionSequenceStates;
 use crate::bevy_app::modular_character_plugin::animation_manager_component::AnimationManagerComponent;
+use crate::bevy_app::modular_character_plugin::spawn_combatant::CombatantSpeciesComponent;
 use crate::bevy_app::modular_character_plugin::spawn_combatant::MainSkeletonEntity;
 use crate::bevy_app::modular_character_plugin::Animations;
 use crate::bevy_app::modular_character_plugin::CombatantsById;
@@ -12,6 +13,7 @@ use crate::bevy_app::modular_character_plugin::CombatantsExecutingAttacks;
 use crate::bevy_app::modular_character_plugin::HitRecoveryActivationEvent;
 use crate::bevy_app::modular_character_plugin::HomeLocation;
 use crate::bevy_app::utils::link_animations::AnimationEntityLink;
+use crate::frontend_common::CombatantSpecies;
 use bevy::prelude::*;
 use js_sys::Date;
 
@@ -23,6 +25,7 @@ pub fn process_active_animation_states(
         &mut AnimationManagerComponent,
         &HomeLocation,
     )>,
+    species_query: Query<&CombatantSpeciesComponent>,
     mut transforms: Query<&mut Transform>,
     mut combatants_with_active_action_states: ResMut<CombatantsExecutingAttacks>,
     animation_player_links: Query<&AnimationEntityLink>,
@@ -41,6 +44,10 @@ pub fn process_active_animation_states(
         let (skeleton_entity, mut animation_manager, home_location) = combatants
             .get_mut(*combatant_entity)
             .expect("to have the combatant");
+
+        let species = species_query
+            .get(skeleton_entity.0)
+            .expect("a species component on the skeleton");
 
         if animation_manager.active_states.len() == 0 {
             combatants_with_active_action_states.0.remove(combatant_id);
@@ -72,6 +79,7 @@ pub fn process_active_animation_states(
                         &mut animation_player,
                         &animations,
                         current_time,
+                        &species.0,
                     );
                 }
                 ActionSequenceStates::Swinging => process_combatant_swinging_weapons(
@@ -82,6 +90,7 @@ pub fn process_active_animation_states(
                     &assets_animation_clips,
                     current_time,
                     &mut hit_recovery_activation_event_writer,
+                    &species.0,
                 ),
                 ActionSequenceStates::Returning => {
                     let mut skeleton_entity_transform = transforms
@@ -95,6 +104,7 @@ pub fn process_active_animation_states(
                         &mut animation_player,
                         &animations,
                         current_time,
+                        &species.0,
                     )
                 }
                 ActionSequenceStates::Recentering => {
@@ -117,6 +127,7 @@ pub fn process_active_animation_states(
                         &animations,
                         &assets_animation_clips,
                         &mut transforms,
+                        &species.0,
                     );
                 }
             }

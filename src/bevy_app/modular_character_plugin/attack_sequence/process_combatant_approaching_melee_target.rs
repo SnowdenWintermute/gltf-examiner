@@ -3,7 +3,9 @@ use super::translate_transform_toward_target::translate_transform_toward_target;
 use crate::bevy_app::modular_character_plugin::animation_manager_component::ActionSequenceStates;
 use crate::bevy_app::modular_character_plugin::animation_manager_component::AnimationManagerComponent;
 use crate::bevy_app::modular_character_plugin::Animations;
-use crate::frontend_common::animation_names::SWORD_SLASH;
+use crate::frontend_common::animation_names::AnimationType;
+use crate::frontend_common::animation_names::CombatantAnimations;
+use crate::frontend_common::CombatantSpecies;
 use bevy::math::u64;
 use bevy::prelude::*;
 use std::time::Duration;
@@ -20,6 +22,7 @@ pub fn process_combatant_approaching_melee_target(
     animation_player: &mut AnimationPlayer,
     animations: &Res<Animations>,
     current_time: u64,
+    species: &CombatantSpecies,
 ) {
     // approaching
     // - move toward destination
@@ -49,10 +52,12 @@ pub fn process_combatant_approaching_melee_target(
             .active_states
             .insert(ActionSequenceStates::Swinging, Some(current_time));
 
+        let attack_anim_name = species.animation_name(AnimationType::Attack);
+
         // - start playing swing animation
         let animation_handle = animations
             .0
-            .get(SWORD_SLASH)
+            .get(&attack_anim_name)
             .expect("to have this animation");
         animation_player.play_with_transition(animation_handle.clone(), Duration::from_millis(500));
     }

@@ -69,7 +69,10 @@ impl Plugin for ModularCharacterPlugin {
             .add_plugins(PartChangePlugin)
             .add_systems(
                 OnEnter(AssetLoaderState::RegisteringAnimations),
-                (register_animations, draw_aabbs),
+                (
+                    register_animations,
+                    // draw_aabbs
+                ),
             )
             .add_systems(
                 Update,
@@ -79,7 +82,7 @@ impl Plugin for ModularCharacterPlugin {
                     link_animations,
                     run_animations,
                     handle_animation_change_requests,
-                    draw_directional_gizmos,
+                    // draw_directional_gizmos,
                     handle_attack_sequence_start_requests,
                     process_active_animation_states,
                     start_combatant_hit_recoveries,

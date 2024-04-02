@@ -1,7 +1,9 @@
 use crate::bevy_app::modular_character_plugin::animation_manager_component::ActionSequenceStates;
 use crate::bevy_app::modular_character_plugin::animation_manager_component::AnimationManagerComponent;
 use crate::bevy_app::modular_character_plugin::Animations;
-use crate::frontend_common::animation_names::HIT_RECOVERY;
+use crate::frontend_common::animation_names::AnimationType;
+use crate::frontend_common::animation_names::CombatantAnimations;
+use crate::frontend_common::CombatantSpecies;
 use bevy::prelude::*;
 
 pub const TIME_TO_SHOW_HP_CHANGE_NUMBER: u64 = 1000;
@@ -14,10 +16,13 @@ pub fn process_combatant_hit_recovery(
     animations: &Res<Animations>,
     assets_animation_clips: &Res<Assets<AnimationClip>>,
     transforms: &mut Query<&mut Transform>,
+    species: &CombatantSpecies,
 ) {
+    let anim_name = species.animation_name(AnimationType::HitRecovery);
+
     let animation_handle = animations
         .0
-        .get(HIT_RECOVERY)
+        .get(&anim_name)
         .expect("to have this animation registered");
     let animation_clip = assets_animation_clips
         .get(animation_handle)

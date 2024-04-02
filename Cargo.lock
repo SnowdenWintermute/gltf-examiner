@@ -2398,6 +2398,7 @@ dependencies = [
  "crossbeam-channel",
  "gloo 0.10.0",
  "js-sys",
+ "once_cell",
  "rand",
  "tokio",
  "wasm-bindgen",

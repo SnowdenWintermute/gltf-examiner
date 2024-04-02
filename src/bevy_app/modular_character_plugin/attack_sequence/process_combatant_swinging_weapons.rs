@@ -2,8 +2,9 @@ use crate::bevy_app::modular_character_plugin::animation_manager_component::Acti
 use crate::bevy_app::modular_character_plugin::animation_manager_component::AnimationManagerComponent;
 use crate::bevy_app::modular_character_plugin::Animations;
 use crate::bevy_app::modular_character_plugin::HitRecoveryActivationEvent;
-use crate::frontend_common::animation_names::RUN_BACK;
-use crate::frontend_common::animation_names::SWORD_SLASH;
+use crate::frontend_common::animation_names::AnimationType;
+use crate::frontend_common::animation_names::CombatantAnimations;
+use crate::frontend_common::CombatantSpecies;
 use bevy::math::u64;
 use bevy::prelude::*;
 use std::time::Duration;
@@ -19,11 +20,13 @@ pub fn process_combatant_swinging_weapons(
     assets_animation_clips: &Res<Assets<AnimationClip>>,
     current_time: u64,
     hit_recovery_activation_event_writer: &mut EventWriter<HitRecoveryActivationEvent>,
+    species: &CombatantSpecies,
 ) {
+    let anim_name = species.animation_name(AnimationType::Attack);
     // - if duration threshold passed, activate returning
     let animation_handle = animations
         .0
-        .get(SWORD_SLASH)
+        .get(&anim_name)
         .expect("to have this animation registered");
     let animation_clip = assets_animation_clips
         .get(animation_handle)
@@ -51,7 +54,11 @@ pub fn process_combatant_swinging_weapons(
         animation_manager.last_location = animation_manager.destination.take();
         animation_manager.destination = Some(home_location.clone());
 
-        let animation_handle = animations.0.get(RUN_BACK).expect("to have this animation");
+        let anim_name = species.animation_name(AnimationType::ReturningToHome);
+        let animation_handle = animations
+            .0
+            .get(&anim_name)
+            .expect("to have this animation");
         animation_player
             .play_with_transition(animation_handle.clone(), Duration::from_millis(500))
             .repeat();

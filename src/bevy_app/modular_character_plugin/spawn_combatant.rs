@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use super::animation_manager_component::AnimationManagerComponent;
 use super::spawn_scenes::spawn_scene;
 use super::CombatantId;
@@ -54,7 +56,8 @@ pub fn spawn_combatants(
 
         let file_name = match species {
             CombatantSpecies::Humanoid => "main_skeleton.glb",
-            CombatantSpecies::Spider => "spider_main_skeleton.glb",
+            CombatantSpecies::Wasp => "wasp_main_skeleton.glb",
+            CombatantSpecies::Frog => "frog_main_skeleton.glb",
         };
 
         let skeleton_handle = asset_pack
